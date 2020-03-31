@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/mqttClientWrapper.dart';
+import 'package:sensors/sensors.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,7 +16,12 @@ class _MyAppState extends State<MyApp> {
   String latitude = "waiting...";
   String longitude = "waiting...";
 
+  List<double> _gyroscopeValues;
+  List<StreamSubscription<dynamic>> _streamSubscriptions =
+      <StreamSubscription<dynamic>>[];
+
   MQTTClientWrapper mqttClientWrapper;
+
   void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
     mqttClientWrapper.prepareMqttClient();
@@ -45,7 +51,13 @@ class _MyAppState extends State<MyApp> {
 
     BackgroundLocation.startLocationService();
     geolocationTimer = Timer.periodic(
-        Duration(minutes: 1), (Timer t) => _getAndPublishLocation());
+        Duration(hours: 1), (Timer t) => _getAndPublishLocation());
+
+    _streamSubscriptions.add(gyroscopeEvents.listen((GyroscopeEvent event) {
+      setState(() {
+        _gyroscopeValues = <double>[event.x, event.y, event.z];
+      });
+    }));
   }
 
   @override
@@ -60,6 +72,9 @@ class _MyAppState extends State<MyApp> {
             children: <Widget>[
               locationData("Latitude: " + latitude),
               locationData("Longitude: " + longitude),
+              locationData("X" + _gyroscopeValues[0].toString()),
+              locationData("Y" + _gyroscopeValues[1].toString()),
+              locationData("Z" + _gyroscopeValues[2].toString()),
             ],
           ),
         ),
@@ -76,18 +91,5 @@ class _MyAppState extends State<MyApp> {
       ),
       textAlign: TextAlign.center,
     );
-  }
-
-  getCurrentLocation() {
-    BackgroundLocation().getCurrentLocation().then((location) {
-      print("This is current Location" + location.longitude.toString());
-    });
-  }
-
-  @override
-  void dispose() {
-    geolocationTimer.cancel();
-    BackgroundLocation.stopLocationService();
-    super.dispose();
   }
 }

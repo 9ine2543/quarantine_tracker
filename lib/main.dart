@@ -14,10 +14,6 @@ class _MyAppState extends State<MyApp> {
   Timer geolocationTimer;
   String latitude = "waiting...";
   String longitude = "waiting...";
-  String altitude = "waiting...";
-  String accuracy = "waiting...";
-  String bearing = "waiting...";
-  String speed = "waiting...";
 
   MQTTClientWrapper mqttClientWrapper;
   void mqttSetup() {
@@ -30,19 +26,11 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         this.latitude = location.latitude.toString();
         this.longitude = location.longitude.toString();
-        this.accuracy = location.accuracy.toString();
-        this.altitude = location.altitude.toString();
-        this.bearing = location.bearing.toString();
-        this.speed = location.speed.toString();
       });
 
       print("""\n
         Latitude:  $latitude
         Longitude: $longitude
-        Altitude: $altitude
-        Accuracy: $accuracy
-        Bearing:  $bearing
-        Speed: $speed
       """);
 
       print(DateTime.now().toUtc().toString());
@@ -72,10 +60,6 @@ class _MyAppState extends State<MyApp> {
             children: <Widget>[
               locationData("Latitude: " + latitude),
               locationData("Longitude: " + longitude),
-              locationData("Altitude: " + altitude),
-              locationData("Accuracy: " + accuracy),
-              locationData("Bearing: " + bearing),
-              locationData("Speed: " + speed),
             ],
           ),
         ),

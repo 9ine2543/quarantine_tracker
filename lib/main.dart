@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/mqttClientWrapper.dart';
@@ -10,6 +11,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Timer geolocationTimer;
   String latitude = "waiting...";
   String longitude = "waiting...";
   String altitude = "waiting...";
@@ -18,18 +20,13 @@ class _MyAppState extends State<MyApp> {
   String speed = "waiting...";
 
   MQTTClientWrapper mqttClientWrapper;
-  void MQTTsetup() {
+  void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
     mqttClientWrapper.prepareMqttClient();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    MQTTsetup();
-
-    BackgroundLocation.startLocationService();
-    BackgroundLocation.getLocationUpdates((location) {
+  void _getAndPublishLocation() {
+    BackgroundLocation().getCurrentLocation().then((location) {
       setState(() {
         this.latitude = location.latitude.toString();
         this.longitude = location.longitude.toString();
@@ -40,16 +37,27 @@ class _MyAppState extends State<MyApp> {
       });
 
       print("""\n
-      Latitude:  $latitude
-      Longitude: $longitude
-      Altitude: $altitude
-      Accuracy: $accuracy
-      Bearing:  $bearing
-      Speed: $speed
+        Latitude:  $latitude
+        Longitude: $longitude
+        Altitude: $altitude
+        Accuracy: $accuracy
+        Bearing:  $bearing
+        Speed: $speed
       """);
 
+      print(DateTime.now().toUtc().toString());
       mqttClientWrapper.publishLocation(location.latitude, location.longitude);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    mqttSetup();
+
+    BackgroundLocation.startLocationService();
+    geolocationTimer = Timer.periodic(
+        Duration(minutes: 1), (Timer t) => _getAndPublishLocation());
   }
 
   @override
@@ -68,21 +76,6 @@ class _MyAppState extends State<MyApp> {
               locationData("Accuracy: " + accuracy),
               locationData("Bearing: " + bearing),
               locationData("Speed: " + speed),
-              RaisedButton(
-                  onPressed: () {
-                    BackgroundLocation.startLocationService();
-                  },
-                  child: Text("Start Location Service")),
-              RaisedButton(
-                  onPressed: () {
-                    BackgroundLocation.stopLocationService();
-                  },
-                  child: Text("Stop Location Service")),
-              RaisedButton(
-                  onPressed: () {
-                    getCurrentLocation();
-                  },
-                  child: Text("Get Current Location")),
             ],
           ),
         ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/mqttClientWrapper.dart';
@@ -10,46 +11,41 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Timer geolocationTimer;
   String latitude = "waiting...";
   String longitude = "waiting...";
-  String altitude = "waiting...";
-  String accuracy = "waiting...";
-  String bearing = "waiting...";
-  String speed = "waiting...";
 
   MQTTClientWrapper mqttClientWrapper;
-  void MQTTsetup() {
+  void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
     mqttClientWrapper.prepareMqttClient();
+  }
+
+  void _getAndPublishLocation() {
+    BackgroundLocation().getCurrentLocation().then((location) {
+      setState(() {
+        this.latitude = location.latitude.toString();
+        this.longitude = location.longitude.toString();
+      });
+
+      print("""\n
+        Latitude:  $latitude
+        Longitude: $longitude
+      """);
+
+      print(DateTime.now().toUtc().toString());
+      mqttClientWrapper.publishLocation(location.latitude, location.longitude);
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    MQTTsetup();
+    mqttSetup();
 
     BackgroundLocation.startLocationService();
-    BackgroundLocation.getLocationUpdates((location) {
-      setState(() {
-        this.latitude = location.latitude.toString();
-        this.longitude = location.longitude.toString();
-        this.accuracy = location.accuracy.toString();
-        this.altitude = location.altitude.toString();
-        this.bearing = location.bearing.toString();
-        this.speed = location.speed.toString();
-      });
-
-      print("""\n
-      Latitude:  $latitude
-      Longitude: $longitude
-      Altitude: $altitude
-      Accuracy: $accuracy
-      Bearing:  $bearing
-      Speed: $speed
-      """);
-
-      mqttClientWrapper.publishLocation(location.latitude, location.longitude);
-    });
+    geolocationTimer = Timer.periodic(
+        Duration(minutes: 1), (Timer t) => _getAndPublishLocation());
   }
 
   @override
@@ -64,25 +60,6 @@ class _MyAppState extends State<MyApp> {
             children: <Widget>[
               locationData("Latitude: " + latitude),
               locationData("Longitude: " + longitude),
-              locationData("Altitude: " + altitude),
-              locationData("Accuracy: " + accuracy),
-              locationData("Bearing: " + bearing),
-              locationData("Speed: " + speed),
-              RaisedButton(
-                  onPressed: () {
-                    BackgroundLocation.startLocationService();
-                  },
-                  child: Text("Start Location Service")),
-              RaisedButton(
-                  onPressed: () {
-                    BackgroundLocation.stopLocationService();
-                  },
-                  child: Text("Stop Location Service")),
-              RaisedButton(
-                  onPressed: () {
-                    getCurrentLocation();
-                  },
-                  child: Text("Get Current Location")),
             ],
           ),
         ),
@@ -109,6 +86,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    geolocationTimer.cancel();
     BackgroundLocation.stopLocationService();
     super.dispose();
   }

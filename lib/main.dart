@@ -86,6 +86,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    geolocationTimer.cancel();
     BackgroundLocation.stopLocationService();
     super.dispose();
   }

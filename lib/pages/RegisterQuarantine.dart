@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quarantine_tracker/utils/RegisterValidation.dart';
 import 'package:quarantine_tracker/utils/RegisterSizing.dart';
+import 'package:quarantine_tracker/widgets/register/heading.dart';
 
 class RegisterQuarantine extends StatefulWidget {
   @override
@@ -60,48 +61,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
         color: Colors.white,
         child: ListView(
           children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(top: 40, left: 40, bottom: 20),
-              width: MediaQuery.of(context).size.width,
-              height: 180,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(40)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey[300],
-                      offset: Offset(0, 0),
-                      blurRadius: 10,
-                    )
-                  ]),
-              child: Stack(
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.location_on,
-                        size: 60,
-                        color: Color(0xFF427496),
-                      )
-                    ],
-                  ),
-                  Positioned(
-                    bottom: 15,
-                    child: Text(
-                      'ลงทะเบียน',
-                      style: TextStyle(fontSize: 48, color: Color(0xFF427496)),
-                    ),
-                  ),
-                  Positioned(
-                      bottom: 8,
-                      child: Text(
-                        'โปรดกรอกข้อมูลตามความจริง',
-                        style: TextStyle(fontSize: 11, color: Colors.black),
-                      ))
-                ],
-              ),
-            ),
+            RegisterHeading(),
             SizedBox(
               height: 15,
             ),

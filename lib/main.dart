@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:background_location/background_location.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:async';
-import 'package:quarantine_tracker/widgets/RegisterQuarantine.dart';
+import 'package:quarantine_tracker/pages/RegisterQuarantine.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,7 +25,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
- 
   List<double> _gyroscopeValues;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
@@ -41,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-  
+
     _streamSubscriptions.add(gyroscopeEvents.listen((GyroscopeEvent event) {
       setState(() {
         _gyroscopeValues = <double>[event.x, event.y, event.z];
@@ -73,7 +71,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Location"),
@@ -89,20 +86,21 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             RaisedButton(
-                  onPressed: () {
-                    BackgroundLocation.stopLocationService();
-                  },
-                  child: Text("Stop Location Service")),
-              RaisedButton(
-                  onPressed: () {
-                    getCurrentLocation();
-                  },
-                  child: Text("Get Current Location")),
+                onPressed: () {
+                  BackgroundLocation.stopLocationService();
+                },
+                child: Text("Stop Location Service")),
+            RaisedButton(
+                onPressed: () {
+                  getCurrentLocation();
+                },
+                child: Text("Get Current Location")),
           ],
         ),
       ),
     );
   }
+
   getCurrentLocation() {
     BackgroundLocation().getCurrentLocation().then((location) {
       print("This is current Location" + location.longitude.toString());
@@ -117,5 +115,4 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     super.dispose();
   }
-
 }

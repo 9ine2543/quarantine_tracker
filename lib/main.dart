@@ -1,95 +1,118 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
-import 'package:quarantine_tracker/mqttClientWrapper.dart';
 import 'package:sensors/sensors.dart';
+import 'dart:async';
+import 'package:quarantine_tracker/pages/RegisterQuarantine.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Quarantine Tracker',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: RegisterQuarantine(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  Timer geolocationTimer;
-  String latitude = "waiting...";
-  String longitude = "waiting...";
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
 
+class _MyHomePageState extends State<MyHomePage> {
   List<double> _gyroscopeValues;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
 
-  MQTTClientWrapper mqttClientWrapper;
-
-  void mqttSetup() {
-    mqttClientWrapper = MQTTClientWrapper();
-    mqttClientWrapper.prepareMqttClient();
-  }
-
-  void _getAndPublishLocation() {
-    BackgroundLocation().getCurrentLocation().then((location) {
-      setState(() {
-        this.latitude = location.latitude.toString();
-        this.longitude = location.longitude.toString();
-      });
-
-      print("""\n
-        Latitude:  $latitude
-        Longitude: $longitude
-      """);
-
-      print(DateTime.now().toUtc().toString());
-      mqttClientWrapper.publishLocation(location.latitude, location.longitude);
-    });
-  }
+  String latitude = "waiting...";
+  String longitude = "waiting...";
+  String altitude = "waiting...";
+  String accuracy = "waiting...";
+  String bearing = "waiting...";
+  String speed = "waiting...";
 
   @override
   void initState() {
     super.initState();
-    mqttSetup();
-
-    BackgroundLocation.startLocationService();
-    geolocationTimer = Timer.periodic(
-        Duration(hours: 1), (Timer t) => _getAndPublishLocation());
 
     _streamSubscriptions.add(gyroscopeEvents.listen((GyroscopeEvent event) {
       setState(() {
         _gyroscopeValues = <double>[event.x, event.y, event.z];
       });
     }));
+
+    BackgroundLocation.startLocationService();
+    BackgroundLocation.getLocationUpdates((location) {
+      setState(() {
+        this.latitude = location.latitude.toString();
+        this.longitude = location.longitude.toString();
+        this.accuracy = location.accuracy.toString();
+        this.altitude = location.altitude.toString();
+        this.bearing = location.bearing.toString();
+        this.speed = location.speed.toString();
+      });
+
+      print("""\n
+      Latitude:  $latitude
+      Longitude: $longitude
+      Altitude: $altitude
+      Accuracy: $accuracy
+      Bearing:  $bearing
+      Speed: $speed
+      """);
+      print(_gyroscopeValues);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Quarantine Tracker'),
-        ),
-        body: Center(
-          child: ListView(
-            children: <Widget>[
-              locationData("Latitude: " + latitude),
-              locationData("Longitude: " + longitude),
-              locationData("X" + _gyroscopeValues[0].toString()),
-              locationData("Y" + _gyroscopeValues[1].toString()),
-              locationData("Z" + _gyroscopeValues[2].toString()),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Location"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FlatButton(
+              child: Text("Get location"),
+              onPressed: () {
+                BackgroundLocation.startLocationService();
+              },
+            ),
+            RaisedButton(
+                onPressed: () {
+                  BackgroundLocation.stopLocationService();
+                },
+                child: Text("Stop Location Service")),
+            RaisedButton(
+                onPressed: () {
+                  getCurrentLocation();
+                },
+                child: Text("Get Current Location")),
+          ],
         ),
       ),
     );
   }
 
-  Widget locationData(String data) {
-    return Text(
-      data,
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 18,
-      ),
-      textAlign: TextAlign.center,
-    );
+  getCurrentLocation() {
+    BackgroundLocation().getCurrentLocation().then((location) {
+      print("This is current Location" + location.longitude.toString());
+    });
+  }
+
+  @override
+  void dispose() {
+    BackgroundLocation.stopLocationService();
+    for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
+      subscription.cancel();
+    }
+    super.dispose();
   }
 }

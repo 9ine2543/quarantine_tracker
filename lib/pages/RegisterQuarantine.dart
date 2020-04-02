@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:quarantine_tracker/utils/RegisterValidation.dart';
 import 'package:quarantine_tracker/utils/RegisterSizing.dart';
 import 'package:quarantine_tracker/widgets/register/heading.dart';
 import 'package:quarantine_tracker/widgets/register/formHeading.dart';
+import 'package:quarantine_tracker/widgets/register/formInput.dart';
 
 class RegisterQuarantine extends StatefulWidget {
   @override
@@ -11,25 +11,12 @@ class RegisterQuarantine extends StatefulWidget {
 }
 
 class _RegisterQuarantineState extends State<RegisterQuarantine> {
-  final TextEditingController nameController = new TextEditingController();
-  final TextEditingController surnameController = new TextEditingController();
-  final TextEditingController idCardController = new TextEditingController();
-  final TextEditingController phoneController = new TextEditingController();
-  final TextEditingController organizeController = new TextEditingController();
-
-  final TextEditingController dayController = new TextEditingController();
-  //typeOne ONLY
-  final TextEditingController hospitalController = new TextEditingController();
-  //TypeTwo ONLY
-  final TextEditingController covidNameController = new TextEditingController();
-  final TextEditingController covidSurNameController =
-      new TextEditingController();
-  final TextEditingController covidIDCardController =
-      new TextEditingController();
-
   bool _canConfirm, typeOne, typeTwo;
   String _value;
   double boxHeight;
+  String name, surname, citizenId, phoneNumber, organization, days;
+  String hospital, patientName, patientSurname, patientCitizenId;
+
   @override
   Widget build(BuildContext context) {
     boxHeight = getRegisterFormSizing(_value);
@@ -37,21 +24,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
     typeTwo = enableRelativesForm(_value);
 
     if (validateGeneralInputs(
-            nameController.text,
-            surnameController.text,
-            idCardController.text,
-            phoneController.text,
-            organizeController.text) &&
+            name, surname, citizenId, phoneNumber, organization) &&
         _value != null) {
       if (_value == '1') {
-        _canConfirm =
-            validatePatientInputs(dayController.text, hospitalController.text);
+        _canConfirm = validatePatientInputs(days, hospital);
       } else if (_value == '2') {
         _canConfirm = validateRelativeInputs(
-            dayController.text,
-            covidIDCardController.text,
-            covidNameController.text,
-            covidSurNameController.text);
+            days, patientCitizenId, patientName, patientSurname);
       }
     } else {
       _canConfirm = false;
@@ -84,28 +63,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Container(
-                      height: 50,
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20,
-                      ),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(40),
-                              right: Radius.circular(40))),
-                      child: TextField(
-                        controller: nameController,
-                        decoration: InputDecoration(border: InputBorder.none),
-                        keyboardType: TextInputType.text,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter(
-                              RegExp("[A-Za-zก-๙ ]")),
-                          BlacklistingTextInputFormatter(RegExp("[๐-๙]"))
-                        ],
-                      ),
-                    ),
+                    FormInput(
+                        dataType: 'text',
+                        onChange: (input) {
+                          setState(() {
+                            name = input;
+                          });
+                        }),
                     SizedBox(
                       height: 10,
                     ),
@@ -113,28 +77,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Container(
-                      height: 50,
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20,
-                      ),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(40),
-                              right: Radius.circular(40))),
-                      child: TextField(
-                        controller: surnameController,
-                        decoration: InputDecoration(border: InputBorder.none),
-                        keyboardType: TextInputType.text,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter(
-                              RegExp("[A-Za-zก-๙ ]")),
-                          BlacklistingTextInputFormatter(RegExp("[๐-๙]"))
-                        ],
-                      ),
-                    ),
+                    FormInput(
+                        dataType: 'text',
+                        onChange: (input) {
+                          setState(() {
+                            surname = input;
+                          });
+                        }),
                     SizedBox(
                       height: 10,
                     ),
@@ -142,27 +91,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Container(
-                      height: 50,
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20,
-                      ),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(40),
-                              right: Radius.circular(40))),
-                      child: TextField(
-                        controller: idCardController,
-                        decoration: InputDecoration(border: InputBorder.none),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(13),
-                          WhitelistingTextInputFormatter.digitsOnly
-                        ],
-                      ),
-                    ),
+                    FormInput(
+                        dataType: 'number',
+                        onChange: (input) {
+                          setState(() {
+                            citizenId = input;
+                          });
+                        }),
                     SizedBox(
                       height: 10,
                     ),
@@ -170,27 +105,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Container(
-                      height: 50,
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20,
-                      ),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(40),
-                              right: Radius.circular(40))),
-                      child: TextField(
-                        controller: phoneController,
-                        decoration: InputDecoration(border: InputBorder.none),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(10),
-                          WhitelistingTextInputFormatter.digitsOnly
-                        ],
-                      ),
-                    ),
+                    FormInput(
+                        dataType: 'number',
+                        onChange: (input) {
+                          setState(() {
+                            phoneNumber = input;
+                          });
+                        }),
                     SizedBox(
                       height: 10,
                     ),
@@ -198,22 +119,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Container(
-                      height: 50,
-                      padding: EdgeInsets.only(
-                        left: 20,
-                        right: 20,
-                      ),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(40),
-                              right: Radius.circular(40))),
-                      child: TextField(
-                          controller: organizeController,
-                          decoration: InputDecoration(border: InputBorder.none),
-                          keyboardType: TextInputType.text),
-                    ),
+                    FormInput(
+                        dataType: 'text',
+                        onChange: (input) {
+                          setState(() {
+                            organization = input;
+                          });
+                        }),
                     SizedBox(
                       height: 10,
                     ),
@@ -261,28 +173,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  height: 50,
-                                  padding: EdgeInsets.only(
-                                    left: 20,
-                                    right: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(40),
-                                          right: Radius.circular(40))),
-                                  child: TextField(
-                                    controller: hospitalController,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none),
-                                    keyboardType: TextInputType.text,
-                                    inputFormatters: [
-                                      WhitelistingTextInputFormatter(
-                                          RegExp("[A-Za-z0-9ก-๙ ]")),
-                                    ],
-                                  ),
-                                ),
+                                FormInput(
+                                    dataType: 'text',
+                                    onChange: (input) {
+                                      setState(() {
+                                        hospital = input;
+                                      });
+                                    }),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -290,29 +187,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  height: 50,
-                                  padding: EdgeInsets.only(
-                                    left: 20,
-                                    right: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(40),
-                                          right: Radius.circular(40))),
-                                  child: TextField(
-                                    controller: dayController,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: '( xx วัน )'),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      WhitelistingTextInputFormatter(
-                                          RegExp("[0-9]")),
-                                    ],
-                                  ),
-                                ),
+                                FormInput(
+                                    dataType: 'days',
+                                    onChange: (input) {
+                                      setState(() {
+                                        days = input;
+                                      });
+                                    }),
                               ],
                             ),
                           )
@@ -348,30 +229,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  height: 50,
-                                  padding: EdgeInsets.only(
-                                    left: 20,
-                                    right: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(40),
-                                          right: Radius.circular(40))),
-                                  child: TextField(
-                                    controller: covidNameController,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none),
-                                    keyboardType: TextInputType.text,
-                                    inputFormatters: [
-                                      WhitelistingTextInputFormatter(
-                                          RegExp("[A-Za-zก-๙ ]")),
-                                      BlacklistingTextInputFormatter(
-                                          RegExp("[๐-๙]"))
-                                    ],
-                                  ),
-                                ),
+                                FormInput(
+                                    dataType: 'text',
+                                    onChange: (input) {
+                                      setState(() {
+                                        patientName = input;
+                                      });
+                                    }),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -379,30 +243,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  height: 50,
-                                  padding: EdgeInsets.only(
-                                    left: 20,
-                                    right: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(40),
-                                          right: Radius.circular(40))),
-                                  child: TextField(
-                                    controller: covidSurNameController,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none),
-                                    keyboardType: TextInputType.text,
-                                    inputFormatters: [
-                                      WhitelistingTextInputFormatter(
-                                          RegExp("[A-Za-zก-๙ ]")),
-                                      BlacklistingTextInputFormatter(
-                                          RegExp("[๐-๙]"))
-                                    ],
-                                  ),
-                                ),
+                                FormInput(
+                                    dataType: 'text',
+                                    onChange: (input) {
+                                      setState(() {
+                                        patientSurname = input;
+                                      });
+                                    }),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -410,28 +257,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  height: 50,
-                                  padding: EdgeInsets.only(
-                                    left: 20,
-                                    right: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(40),
-                                          right: Radius.circular(40))),
-                                  child: TextField(
-                                    controller: covidIDCardController,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(13),
-                                      WhitelistingTextInputFormatter.digitsOnly
-                                    ],
-                                  ),
-                                ),
+                                FormInput(
+                                    dataType: 'number',
+                                    onChange: (input) {
+                                      setState(() {
+                                        patientCitizenId = input;
+                                      });
+                                    }),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -439,29 +271,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Container(
-                                  height: 50,
-                                  padding: EdgeInsets.only(
-                                    left: 20,
-                                    right: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(40),
-                                          right: Radius.circular(40))),
-                                  child: TextField(
-                                    controller: dayController,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: '( xx วัน )'),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      WhitelistingTextInputFormatter(
-                                          RegExp("[0-9]")),
-                                    ],
-                                  ),
-                                ),
+                                FormInput(
+                                    dataType: 'days',
+                                    onChange: (input) {
+                                      setState(() {
+                                        days = input;
+                                      });
+                                    }),
                               ],
                             ),
                           )

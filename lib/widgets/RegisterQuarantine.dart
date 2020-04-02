@@ -45,28 +45,25 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
       typeTwo = true;
     }
 
-    if (nameController.text == '' ||
-        surnameController.text == '' ||
-        idCardController.text == '' ||
-        phoneController.text == '' ||
-        organizeController.text == '' ||
-        _value == null) {
-      _canConfirm = false;
-    } else {
+    if (validateGeneralInputs(
+            nameController.text,
+            surnameController.text,
+            idCardController.text,
+            phoneController.text,
+            organizeController.text) &&
+        _value != null) {
       if (_value == '1') {
-        if (dayController.text == '' || hospitalController.text == '')
-          _canConfirm = false;
-        else
-          _canConfirm = true;
+        _canConfirm =
+            validatePatientInputs(dayController.text, hospitalController.text);
       } else if (_value == '2') {
-        if (dayController.text == '' ||
-            covidIDCardController.text == '' ||
-            covidNameController.text == '' ||
-            covidSurNameController.text == '')
-          _canConfirm = false;
-        else
-          _canConfirm = true;
+        _canConfirm = validateRelativeInputs(
+            dayController.text,
+            covidIDCardController.text,
+            covidNameController.text,
+            covidSurNameController.text);
       }
+    } else {
+      _canConfirm = false;
     }
 
     return Scaffold(

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:background_location/background_location.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:async';
-import 'package:quarantine_tracker/ui.dart';
+import 'package:quarantine_tracker/widgets/RegisterQuarantine.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: quarantineUI(),
+      home: RegisterQuarantine(),
     );
   }
 }

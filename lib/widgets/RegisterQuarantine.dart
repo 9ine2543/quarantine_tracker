@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quarantine_tracker/utils/RegisterValidation.dart';
+import 'package:quarantine_tracker/utils/RegisterSizing.dart';
 
 class RegisterQuarantine extends StatefulWidget {
   @override
@@ -29,21 +30,9 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
   double boxHeight;
   @override
   Widget build(BuildContext context) {
-    if (_value == null) {
-      boxHeight = 600;
-      typeOne = false;
-      typeTwo = false;
-    } else if (_value == '1') {
-      //type - ผู้ป่วย covid-19
-      boxHeight = 800;
-      typeOne = true;
-      typeTwo = false;
-    } else if (_value == '2') {
-      //type - ผู้ใกล้ชิดผู้ป่วย
-      boxHeight = 1070;
-      typeOne = false;
-      typeTwo = true;
-    }
+    boxHeight = getRegisterFormSizing(_value);
+    typeOne = enablePatientForm(_value);
+    typeTwo = enableRelativesForm(_value);
 
     if (validateGeneralInputs(
             nameController.text,

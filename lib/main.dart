@@ -4,6 +4,8 @@ import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/mqttClientWrapper.dart';
 import 'package:sensors/sensors.dart';
 
+import 'package:quarantine_tracker/pages/quarantineLocation.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -15,6 +17,8 @@ class _MyAppState extends State<MyApp> {
   Timer geolocationTimer;
   String latitude = "waiting...";
   String longitude = "waiting...";
+
+  double lati = 13,long = 100;
 
   List<double> _gyroscopeValues;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
@@ -32,6 +36,8 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         this.latitude = location.latitude.toString();
         this.longitude = location.longitude.toString();
+        this.lati = location.latitude;
+        this.long = location.longitude;
       });
 
       print("""\n
@@ -64,20 +70,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Quarantine Tracker'),
-        ),
-        body: Center(
-          child: ListView(
-            children: <Widget>[
-              locationData("Latitude: " + latitude),
-              locationData("Longitude: " + longitude),
-              locationData("X" + _gyroscopeValues[0].toString()),
-              locationData("Y" + _gyroscopeValues[1].toString()),
-              locationData("Z" + _gyroscopeValues[2].toString()),
-            ],
-          ),
-        ),
+        body: quarantineLocation(lat: 13.608332 ,lng: 100.716687,)//13.608332, 100.716687
       ),
     );
   }

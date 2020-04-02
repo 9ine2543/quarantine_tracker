@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:quarantine_tracker/utils/RegisterValidation.dart';
 import 'package:quarantine_tracker/utils/RegisterSizing.dart';
 import 'package:quarantine_tracker/widgets/register/heading.dart';
+import 'package:quarantine_tracker/widgets/register/formHeading.dart';
 
 class RegisterQuarantine extends StatefulWidget {
   @override
@@ -79,14 +80,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      'ชื่อจริง',
-                      style: TextStyle(
-                          color: Color(0xFF427496),
-                          fontWeight: FontWeight.normal,
-                          decoration: TextDecoration.none,
-                          fontSize: 21),
-                    ),
+                    FormHeading(heading: 'ชื่อจริง'),
                     SizedBox(
                       height: 10,
                     ),
@@ -115,14 +109,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      'นามสกุล',
-                      style: TextStyle(
-                          color: Color(0xFF427496),
-                          fontWeight: FontWeight.normal,
-                          decoration: TextDecoration.none,
-                          fontSize: 21),
-                    ),
+                    FormHeading(heading: 'นามสกุล'),
                     SizedBox(
                       height: 10,
                     ),
@@ -151,14 +138,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      'เลขบัตรประชาชน',
-                      style: TextStyle(
-                          color: Color(0xFF427496),
-                          fontWeight: FontWeight.normal,
-                          decoration: TextDecoration.none,
-                          fontSize: 21),
-                    ),
+                    FormHeading(heading: 'เลขบัตรประชาชน'),
                     SizedBox(
                       height: 10,
                     ),
@@ -186,14 +166,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      'หมายเลขโทรศัพท์เคลื่อนที่',
-                      style: TextStyle(
-                          color: Color(0xFF427496),
-                          fontWeight: FontWeight.normal,
-                          decoration: TextDecoration.none,
-                          fontSize: 21),
-                    ),
+                    FormHeading(heading: 'หมายเลขโทรศัพท์เคลื่อนที่'),
                     SizedBox(
                       height: 10,
                     ),
@@ -221,14 +194,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      'รหัสหน่วยงานที่ดูแล',
-                      style: TextStyle(
-                          color: Color(0xFF427496),
-                          fontWeight: FontWeight.normal,
-                          decoration: TextDecoration.none,
-                          fontSize: 21),
-                    ),
+                    FormHeading(heading: 'รหัสหน่วยงานที่ดูแล'),
                     SizedBox(
                       height: 10,
                     ),
@@ -291,14 +257,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text(
-                                  'โรงพยาบาล',
-                                  style: TextStyle(
-                                      color: Color(0xFF427496),
-                                      fontWeight: FontWeight.normal,
-                                      decoration: TextDecoration.none,
-                                      fontSize: 21),
-                                ),
+                                FormHeading(heading: 'โรงพยาบาล'),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -327,14 +286,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text(
-                                  'ระยะเวลา',
-                                  style: TextStyle(
-                                      color: Color(0xFF427496),
-                                      fontWeight: FontWeight.normal,
-                                      decoration: TextDecoration.none,
-                                      fontSize: 21),
-                                ),
+                                FormHeading(heading: 'ระยะเวลา'),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -392,14 +344,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text(
-                                  'ชื่อจริง',
-                                  style: TextStyle(
-                                      color: Color(0xFF427496),
-                                      fontWeight: FontWeight.normal,
-                                      decoration: TextDecoration.none,
-                                      fontSize: 21),
-                                ),
+                                FormHeading(heading: 'ชื่อจริง'),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -430,14 +375,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text(
-                                  'นามสกุล',
-                                  style: TextStyle(
-                                      color: Color(0xFF427496),
-                                      fontWeight: FontWeight.normal,
-                                      decoration: TextDecoration.none,
-                                      fontSize: 21),
-                                ),
+                                FormHeading(heading: 'นามสกุล'),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -468,14 +406,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text(
-                                  'เลขบัตรประชาชน',
-                                  style: TextStyle(
-                                      color: Color(0xFF427496),
-                                      fontWeight: FontWeight.normal,
-                                      decoration: TextDecoration.none,
-                                      fontSize: 21),
-                                ),
+                                FormHeading(heading: 'เลขบัตรประชาชน'),
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -504,14 +435,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text(
-                                  'ระยะเวลา',
-                                  style: TextStyle(
-                                      color: Color(0xFF427496),
-                                      fontWeight: FontWeight.normal,
-                                      decoration: TextDecoration.none,
-                                      fontSize: 21),
-                                ),
+                                FormHeading(heading: 'ระยะเวลา'),
                                 SizedBox(
                                   height: 10,
                                 ),

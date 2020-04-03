@@ -1,9 +1,9 @@
+import 'dart:async';
+import 'package:sensors/sensors.dart';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
-import 'package:sensors/sensors.dart';
-import 'dart:async';
+import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/RegisterQuarantine.dart';
-
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
 
 void main() => runApp(MyApp());
@@ -26,13 +26,13 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-double lati = 13,long = 100;
 class _MyHomePageState extends State<MyHomePage> {
   List<double> _gyroscopeValues;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
-
+  double lati = 13, long = 100;
   MQTTClientWrapper mqttClientWrapper;
+  Timer geofetchTimer;
 
   void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
@@ -57,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       mqttClientWrapper.publishLocation(location.latitude, location.longitude);
     });
   }
+
   String latitude = "waiting...";
   String longitude = "waiting...";
   String altitude = "waiting...";
@@ -75,25 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }));
 
     BackgroundLocation.startLocationService();
-    BackgroundLocation.getLocationUpdates((location) {
-      setState(() {
-        this.latitude = location.latitude.toString();
-        this.longitude = location.longitude.toString();
-        this.accuracy = location.accuracy.toString();
-        this.altitude = location.altitude.toString();
-        this.bearing = location.bearing.toString();
-        this.speed = location.speed.toString();
-      });
-
-      print("""\n
-      Latitude:  $latitude
-      Longitude: $longitude
-      Altitude: $altitude
-      Accuracy: $accuracy
-      Bearing:  $bearing
-      Speed: $speed
-      """);
-      print(_gyroscopeValues);
+    geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
+      _getAndPublishLocation();
     });
   }
 
@@ -101,8 +85,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: quarantineLocation(lat: 13.608332 ,lng: 100.716687,)//13.608332, 100.716687
-      ),
+          body: QuarantineLocation(
+        lat: 13.608332,
+        lng: 100.716687,
+      )),
     );
   }
 

@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:math';
 import 'dart:async';
 
-class quarantineLocation extends StatefulWidget {
-
+class QuarantineLocation extends StatefulWidget {
   final lat;
   final lng;
 
-  quarantineLocation({this.lat,this.lng});
+  QuarantineLocation({this.lat, this.lng});
 
   @override
-  _quarantineLocationState createState() => _quarantineLocationState();
+  _QuarantineLocationState createState() => _QuarantineLocationState();
 }
 
-class _quarantineLocationState extends State<quarantineLocation> {
-
+class _QuarantineLocationState extends State<QuarantineLocation> {
   Completer<GoogleMapController> _controller = Completer();
 
   @override
@@ -32,7 +29,7 @@ class _quarantineLocationState extends State<quarantineLocation> {
             GoogleMap(
               mapType: MapType.normal,
               rotateGesturesEnabled: false,
-              scrollGesturesEnabled:true,
+              scrollGesturesEnabled: true,
               tiltGesturesEnabled: false,
               zoomGesturesEnabled: false,
               // markers: {
@@ -43,7 +40,7 @@ class _quarantineLocationState extends State<quarantineLocation> {
               //   )
               // },
               initialCameraPosition: CameraPosition(
-                target: LatLng(widget.lat-0.000068,widget.lng),
+                target: LatLng(widget.lat - 0.000068, widget.lng),
                 zoom: 18,
               ),
               onMapCreated: (GoogleMapController controller) {
@@ -55,42 +52,40 @@ class _quarantineLocationState extends State<quarantineLocation> {
               child: RippleAnimation(),
             ),
             Align(
-              alignment: Alignment.center,
-              child: Container(
-                height: 155,
-                width:200,
-                child:Stack(
-                  children: <Widget>[
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Icon(Icons.location_on, size: 70,color: Color(0xFF427496),),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                           'ระบบกำลังติดตาม',
-                           style: TextStyle(
-                             fontSize: 20,
-                             fontWeight: FontWeight.bold
-                           ),
-                          ),
-                    ),
-                    Positioned(
-                      top: 90,
-                      left: 14,
-                      child: Text(
-                           'ที่อยู่ปัจจุบันของคุณ',
-                           style: TextStyle(
-                             fontSize: 20,
-                             fontWeight: FontWeight.bold
-                           ),
-                          ),
-                    ),
-                  ],
-                ),
-              )
-            ),
-
+                alignment: Alignment.center,
+                child: Container(
+                  height: 155,
+                  width: 200,
+                  child: Stack(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Icon(
+                          Icons.location_on,
+                          size: 70,
+                          color: Color(0xFF427496),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'ระบบกำลังติดตาม',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Positioned(
+                        top: 90,
+                        left: 14,
+                        child: Text(
+                          'ที่อยู่ปัจจุบันของคุณ',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
           ],
         ),
       ),
@@ -105,7 +100,7 @@ class SpritePainter extends CustomPainter {
 
   void circle(Canvas canvas, Rect rect, double value) {
     double opacity = (0.7 - (value / 4.0)).clamp(0.0, 1.0);
-    Color color = new Color.fromRGBO(66, 116, 150, opacity-10);
+    Color color = new Color.fromRGBO(66, 116, 150, opacity - 10);
 
     double size = rect.width / 1.5;
     double area = size * size;
@@ -120,7 +115,7 @@ class SpritePainter extends CustomPainter {
     Rect rect = new Rect.fromLTRB(0.0, 0.0, size.width, size.height);
 
     for (int wave = 3; wave >= 0; wave--) {
-      circle(canvas, rect, wave + _animation.value );
+      circle(canvas, rect, wave + _animation.value);
     }
   }
 
@@ -147,11 +142,13 @@ class RippleAnimationState extends State<RippleAnimation>
       duration: Duration(seconds: 1),
     )..repeat();
   }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return new Container(

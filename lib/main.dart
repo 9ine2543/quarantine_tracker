@@ -4,6 +4,8 @@ import 'package:sensors/sensors.dart';
 import 'dart:async';
 import 'package:quarantine_tracker/pages/RegisterQuarantine.dart';
 
+import 'package:quarantine_tracker/pages/quarantineLocation.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -24,11 +26,37 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+double lati = 13,long = 100;
 class _MyHomePageState extends State<MyHomePage> {
   List<double> _gyroscopeValues;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
 
+  MQTTClientWrapper mqttClientWrapper;
+
+  void mqttSetup() {
+    mqttClientWrapper = MQTTClientWrapper();
+    mqttClientWrapper.prepareMqttClient();
+  }
+
+  void _getAndPublishLocation() {
+    BackgroundLocation().getCurrentLocation().then((location) {
+      setState(() {
+        this.latitude = location.latitude.toString();
+        this.longitude = location.longitude.toString();
+        this.lati = location.latitude;
+        this.long = location.longitude;
+      });
+
+      print("""\n
+        Latitude:  $latitude
+        Longitude: $longitude
+      """);
+
+      print(DateTime.now().toUtc().toString());
+      mqttClientWrapper.publishLocation(location.latitude, location.longitude);
+    });
+  }
   String latitude = "waiting...";
   String longitude = "waiting...";
   String altitude = "waiting...";
@@ -71,32 +99,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Location"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            FlatButton(
-              child: Text("Get location"),
-              onPressed: () {
-                BackgroundLocation.startLocationService();
-              },
-            ),
-            RaisedButton(
-                onPressed: () {
-                  BackgroundLocation.stopLocationService();
-                },
-                child: Text("Stop Location Service")),
-            RaisedButton(
-                onPressed: () {
-                  getCurrentLocation();
-                },
-                child: Text("Get Current Location")),
-          ],
-        ),
+    return MaterialApp(
+      home: Scaffold(
+        body: quarantineLocation(lat: 13.608332 ,lng: 100.716687,)//13.608332, 100.716687
       ),
     );
   }

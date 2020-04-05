@@ -4,7 +4,7 @@ import 'package:quarantine_tracker/utils/RegisterSizing.dart';
 import 'package:quarantine_tracker/widgets/register/heading.dart';
 import 'package:quarantine_tracker/widgets/register/formHeading.dart';
 import 'package:quarantine_tracker/widgets/register/formInput.dart';
-import 'package:quarantine_tracker/services/Quarantine.dart';
+import 'package:quarantine_tracker/services/registration.dart';
 
 class RegisterQuarantine extends StatefulWidget {
   @override

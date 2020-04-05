@@ -2,17 +2,8 @@ import 'dart:convert';
 
 import 'package:quarantine_tracker/config/constants.dart' as Constants;
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:quarantine_tracker/model/models.dart';
-
-class Payload {
-  int id;
-  double lat;
-  double long;
-
-  Payload(this.id, this.lat, this.long);
-
-  Map toJson() => {'Id': id, 'Lat': lat, 'Long': long};
-}
+import 'package:quarantine_tracker/model/mqtt.dart';
+import 'package:quarantine_tracker/model/locationLog.dart';
 
 class MQTTClientWrapper {
   MqttClient client;
@@ -28,7 +19,7 @@ class MQTTClientWrapper {
 
   // Currently publish sample payload.
   void publishLocation(double latitude, double longitude) {
-    Payload sample = Payload(1102501543184, latitude, longitude);
+    LocationLog sample = LocationLog(1102501543184, latitude, longitude);
     String locationJson = jsonEncode(sample);
     _publishMessage(locationJson);
   }

@@ -3,7 +3,7 @@ import 'package:sensors/sensors.dart';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
-import 'package:quarantine_tracker/pages/RegisterQuarantine.dart';
+import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
 
 void main() => runApp(MyApp());

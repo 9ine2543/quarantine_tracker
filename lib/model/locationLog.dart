@@ -9,7 +9,7 @@ class LocationLog {
   Map toJson() => {'Id': id, 'Lat': lat, 'Long': long};
 
   Map<String, dynamic> toMap() =>
-      {'Id': id, 'Lat': lat, 'Long': long, 'Timestamp': timestamp};
+      {'citizen_id': id, 'lat': lat, 'long': long, 'timestamp': timestamp};
 
   @override
   String toString() {

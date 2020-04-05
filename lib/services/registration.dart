@@ -1,5 +1,6 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 final String url = "http://203.151.51.75:8008";
 
@@ -34,4 +35,21 @@ Future<int> sendPayloadForRegister(
   } finally {
     client.close();
   }
+}
+
+Future<void> saveToSharedPreferences(
+    {String organization,
+    String citizenId,
+    String name,
+    String surname,
+    String hospital,
+    String days}) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('organization', organization);
+  prefs.setString('citizenId', citizenId);
+  prefs.setString('name', name);
+  prefs.setString('surname', surname);
+  prefs.setString('hospital', hospital);
+  prefs.setInt('days', int.parse(days));
+  prefs.setString('startDate', DateTime.now().toString());
 }

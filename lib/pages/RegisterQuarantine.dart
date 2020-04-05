@@ -309,6 +309,14 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                               surname: surname,
                               phoneNumber: phoneNumber,
                               organization: organization,
+                              hospital: hospital,
+                              days: days);
+                          saveToSharedPreferences(
+                              citizenId: citizenId,
+                              name: name,
+                              surname: surname,
+                              hospital: hospital,
+                              organization: organization,
                               days: days);
                         },
                         child: Text(

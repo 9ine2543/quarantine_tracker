@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,7 +12,9 @@ Future<int> sendPayloadForRegister(
     String surname,
     String phoneNumber,
     String hospital,
-    String days}) async {
+    String days,
+    double lat,
+    double lng}) async {
   var client = http.Client();
   try {
     var response = await client.post(url,
@@ -24,8 +27,8 @@ Future<int> sendPayloadForRegister(
           "Type": 1,
           "Hospital": hospital,
           "Duration": int.parse(days),
-          "Lat": 13.7218,
-          "Lon": 100.727
+          "Lat": lat,
+          "Lon": lng
         }),
         headers: {"Content-Type": "application/json"});
     final int statusCode = response.statusCode;
@@ -43,7 +46,9 @@ Future<void> saveToSharedPreferences(
     String name,
     String surname,
     String hospital,
-    String days}) async {
+    String days,
+    double lat,
+    double lng}) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('organization', organization);
   prefs.setString('citizenId', citizenId);
@@ -52,4 +57,6 @@ Future<void> saveToSharedPreferences(
   prefs.setString('hospital', hospital);
   prefs.setInt('days', int.parse(days));
   prefs.setString('startDate', DateTime.now().toString());
+  prefs.setString('lat', '${lat}');
+  prefs.setString('lng', '${lng}');
 }

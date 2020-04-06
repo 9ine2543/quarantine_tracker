@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:quarantine_tracker/pages/quarantineLocation.dart';
 import 'package:quarantine_tracker/utils/RegisterValidation.dart';
 import 'package:quarantine_tracker/utils/RegisterSizing.dart';
 import 'package:quarantine_tracker/widgets/register/heading.dart';
 import 'package:quarantine_tracker/widgets/register/formHeading.dart';
 import 'package:quarantine_tracker/widgets/register/formInput.dart';
 import 'package:quarantine_tracker/services/registration.dart';
+import 'package:geolocator/geolocator.dart';
 
 class RegisterQuarantine extends StatefulWidget {
   @override
@@ -18,6 +18,15 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
   double boxHeight;
   String name, surname, citizenId, phoneNumber, organization, days;
   String hospital, patientName, patientSurname, patientCitizenId;
+  Position _currentPosition;
+  Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getCurrentLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -304,6 +313,8 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                 child: _canConfirm
                     ? FlatButton(
                         onPressed: () {
+                          _getCurrentLocation();
+
                           sendPayloadForRegister(
                               citizenId: citizenId,
                               name: name,
@@ -311,14 +322,20 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                               phoneNumber: phoneNumber,
                               organization: organization,
                               hospital: hospital,
-                              days: days);
+                              days: days,
+                              lat: _currentPosition.latitude,
+                              lng: _currentPosition.longitude);
                           saveToSharedPreferences(
                               citizenId: citizenId,
                               name: name,
                               surname: surname,
                               hospital: hospital,
                               organization: organization,
-                              days: days);
+                              days: days,
+                              lat: _currentPosition.latitude,
+                              lng: _currentPosition.longitude);
+                          
+                          print(_currentPosition);
                           Navigator.pushNamed(context, '/');
                         },
                         child: Text(
@@ -341,5 +358,17 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
         ),
       ),
     );
+  }
+
+  void _getCurrentLocation() {
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        _currentPosition = position;
+      });
+    }).catchError((e) {
+      print(e);
+    });
   }
 }

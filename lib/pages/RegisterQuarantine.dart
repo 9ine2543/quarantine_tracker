@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quarantine_tracker/pages/quarantineLocation.dart';
 import 'package:quarantine_tracker/utils/RegisterValidation.dart';
 import 'package:quarantine_tracker/utils/RegisterSizing.dart';
 import 'package:quarantine_tracker/widgets/register/heading.dart';
@@ -318,6 +319,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                               hospital: hospital,
                               organization: organization,
                               days: days);
+                          Navigator.pushNamed(context, '/');
                         },
                         child: Text(
                           'ยืนยัน',

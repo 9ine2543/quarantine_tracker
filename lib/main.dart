@@ -1,23 +1,34 @@
 import 'dart:async';
-import 'package:sensors/sensors.dart';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
+import 'package:quarantine_tracker/services/preferences.dart';
 
-void main() => runApp(MyApp());
+var initScreen;
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  initScreen = await checkPreferences().then((haveRegistered) {
+    return haveRegistered ? '/' : 'register';
+  });
+  print('$initScreen');
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Quarantine Tracker',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: RegisterQuarantine(),
-    );
+        title: 'Quarantine Tracker',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        initialRoute: initScreen,
+        routes: {
+          '/': (context) => MyHomePage(),
+          'register': (context) => RegisterQuarantine()
+        });
   }
 }
 
@@ -27,7 +38,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<double> _gyroscopeValues;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
   double lati = 13, long = 100;
@@ -68,12 +78,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
-    _streamSubscriptions.add(gyroscopeEvents.listen((GyroscopeEvent event) {
-      setState(() {
-        _gyroscopeValues = <double>[event.x, event.y, event.z];
-      });
-    }));
 
     BackgroundLocation.startLocationService();
     geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {

@@ -24,69 +24,72 @@ class _QuarantineLocationState extends State<QuarantineLocation> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.only(top: 50, bottom: 30, left: 30, right: 30),
-        child: Stack(
-          children: <Widget>[
-            GoogleMap(
-              mapType: MapType.normal,
-              rotateGesturesEnabled: false,
-              scrollGesturesEnabled: true,
-              tiltGesturesEnabled: false,
-              zoomGesturesEnabled: false,
-              // markers: {
-              //   Marker(
-              //     draggable: false,
-              //     markerId: MarkerId("1"),
-              //     position: LatLng(widget.lat, widget.lng),
-              //   )
-              // },
-              initialCameraPosition: CameraPosition(
-                target: LatLng(widget.lat - 0.000068, widget.lng),
-                zoom: 18,
+        child: IgnorePointer(
+          ignoring: true,
+          child: Stack(
+            children: <Widget>[
+              GoogleMap(
+                mapType: MapType.normal,
+                rotateGesturesEnabled: false,
+                scrollGesturesEnabled: true,
+                tiltGesturesEnabled: false,
+                zoomGesturesEnabled: false,
+                // markers: {
+                //   Marker(
+                //     draggable: false,
+                //     markerId: MarkerId("1"),
+                //     position: LatLng(widget.lat, widget.lng),
+                //   )
+                // },
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(widget.lat - 0.000068, widget.lng),
+                  zoom: 18,
+                ),
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
               ),
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: RippleAnimation(),
-            ),
-            Align(
+              Align(
                 alignment: Alignment.center,
-                child: Container(
-                  height: 155,
-                  width: 200,
-                  child: Stack(
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Icon(
-                          Icons.location_on,
-                          size: 70,
-                          color: Color(0xFF427496),
+                child: RippleAnimation(),
+              ),
+              Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    height: 155,
+                    width: 200,
+                    child: Stack(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Icon(
+                            Icons.location_on,
+                            size: 70,
+                            color: Color(0xFF427496),
+                          ),
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'ระบบกำลังติดตาม',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'ระบบกำลังติดตาม',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                      Positioned(
-                        top: 90,
-                        left: 14,
-                        child: Text(
-                          'ที่อยู่ปัจจุบันของคุณ',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                        Positioned(
+                          top: 90,
+                          left: 14,
+                          child: Text(
+                            'ที่อยู่ปัจจุบันของคุณ',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                )),
-          ],
+                      ],
+                    ),
+                  )),
+            ],
+          ),
         ),
       ),
     );

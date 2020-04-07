@@ -49,7 +49,24 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
 
     return Scaffold(
       body: Container(
-        color: Colors.white,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [
+              0.05,
+              0.2,
+              0.3,
+              0.4,
+            ],
+            colors: [
+              Color(0xFFFFA24C), 
+              Color(0xFFFF8122),
+              Color(0xFFFF6204),
+              Color(0xFFF25300)
+            ]
+          ),
+        ),
         child: ListView(
           children: <Widget>[
             RegisterHeading(),
@@ -59,17 +76,17 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
             Container(
               width: MediaQuery.of(context).size.width,
               height: boxHeight,
-              color: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                color: Colors.white,
+              ),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Color(0xFFD2ECFF),
-                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    SizedBox(height: 14,),
                     FormHeading(heading: 'ชื่อจริง'),
                     SizedBox(
                       height: 10,
@@ -147,10 +164,13 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                         right: 20,
                       ),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(40),
-                              right: Radius.circular(40))),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.horizontal(
+                            left: Radius.circular(40),
+                            right: Radius.circular(40)),
+                        border: Border.all(color: Colors.grey[300])
+                      ),
+                        
                       child: DropdownButton<String>(
                         items: [
                           DropdownMenuItem<String>(
@@ -220,18 +240,32 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                 SizedBox(
                                   height: 40,
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      'ข้อมูลผู้ป่วย',
-                                      style: TextStyle(
-                                          color: Color(0xFF427496),
-                                          fontWeight: FontWeight.bold,
-                                          decoration: TextDecoration.none,
-                                          fontSize: 21),
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 35,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.horizontal(left: Radius.circular(20), right: Radius.circular(20)),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Color(0xFFFFA24C), 
+                                        Color(0xFFFF8122),
+                                        Color(0xFFFF6204),
+                                        Color(0xFFF25300)
+                                      ]
                                     ),
-                                  ],
+                                  ),
+                                  child: Text(
+                                      'ข้อมูลผู้ป่วย',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                          decoration: TextDecoration.none,
+                                          fontSize: 21,
+                                          ),
+                                    ),
                                 ),
                                 SizedBox(
                                   height: 10,
@@ -300,12 +334,11 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 15,
-            ),
             Container(
-                width: MediaQuery.of(context).size.width,
-                height: 90,
+              width: MediaQuery.of(context).size.width,
+              height: 90,
+              color: Colors.white,
+              child: Container(
                 decoration: BoxDecoration(
                     color: _canConfirm ? Color(0xFF427496) : Color(0xFFC4C4C4),
                     borderRadius:
@@ -344,7 +377,8 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                             color: Colors.white,
                             fontSize: 28,
                           ),
-                        ))
+                        )
+                      )
                     : FlatButton(
                         onPressed: null,
                         child: Text(
@@ -353,7 +387,10 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                             color: Colors.white,
                             fontSize: 28,
                           ),
-                        ))),
+                        )
+                      )
+              ),
+            )
           ],
         ),
       ),

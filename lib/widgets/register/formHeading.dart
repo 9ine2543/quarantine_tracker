@@ -10,9 +10,10 @@ class FormHeading extends StatelessWidget {
     return Text(
       heading,
       style: TextStyle(
-          color: Color(0xFF427496),
-          fontWeight: FontWeight.normal,
+          color: Color(0xFFFF6204),
+          fontWeight: FontWeight.w500,
           decoration: TextDecoration.none,
+          letterSpacing: -0.5,
           fontSize: 21),
     );
   }

@@ -36,6 +36,7 @@ class _FormInput extends State<FormInput> {
             ),
             decoration: BoxDecoration(
                 color: Colors.white,
+                border: Border.all(color: Colors.grey[300]),
                 borderRadius: BorderRadius.horizontal(
                     left: Radius.circular(40), right: Radius.circular(40))),
             child: TextField(
@@ -56,6 +57,7 @@ class _FormInput extends State<FormInput> {
           ),
           decoration: BoxDecoration(
               color: Colors.white,
+              border: Border.all(color: Colors.grey[300]),
               borderRadius: BorderRadius.horizontal(
                   left: Radius.circular(40), right: Radius.circular(40))),
           child: TextField(
@@ -77,6 +79,7 @@ class _FormInput extends State<FormInput> {
           ),
           decoration: BoxDecoration(
               color: Colors.white,
+              border: Border.all(color: Colors.grey[300]),
               borderRadius: BorderRadius.horizontal(
                   left: Radius.circular(40), right: Radius.circular(40))),
           child: TextField(

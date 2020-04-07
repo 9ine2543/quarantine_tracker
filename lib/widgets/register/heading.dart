@@ -7,16 +7,6 @@ class RegisterHeading extends StatelessWidget {
       padding: EdgeInsets.only(top: 40, left: 40, bottom: 20),
       width: MediaQuery.of(context).size.width,
       height: 180,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey[300],
-              offset: Offset(0, 0),
-              blurRadius: 10,
-            )
-          ]),
       child: Stack(
         children: <Widget>[
           Row(
@@ -24,7 +14,7 @@ class RegisterHeading extends StatelessWidget {
               Icon(
                 Icons.location_on,
                 size: 60,
-                color: Color(0xFF427496),
+                color: Colors.white,
               )
             ],
           ),
@@ -32,14 +22,14 @@ class RegisterHeading extends StatelessWidget {
             bottom: 15,
             child: Text(
               'ลงทะเบียน',
-              style: TextStyle(fontSize: 48, color: Color(0xFF427496)),
+              style: TextStyle(fontSize: 48, color: Colors.white, letterSpacing: -2),
             ),
           ),
           Positioned(
               bottom: 8,
               child: Text(
                 'โปรดกรอกข้อมูลตามความจริง',
-                style: TextStyle(fontSize: 11, color: Colors.black),
+                style: TextStyle(fontSize: 11, color: Colors.white),
               ))
         ],
       ),

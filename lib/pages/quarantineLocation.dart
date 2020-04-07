@@ -34,13 +34,6 @@ class _QuarantineLocationState extends State<QuarantineLocation> {
                 scrollGesturesEnabled: true,
                 tiltGesturesEnabled: false,
                 zoomGesturesEnabled: false,
-                // markers: {
-                //   Marker(
-                //     draggable: false,
-                //     markerId: MarkerId("1"),
-                //     position: LatLng(widget.lat, widget.lng),
-                //   )
-                // },
                 initialCameraPosition: CameraPosition(
                   target: LatLng(widget.lat - 0.000068, widget.lng),
                   zoom: 18,

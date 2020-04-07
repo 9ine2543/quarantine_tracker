@@ -1,4 +1,3 @@
-import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> checkPreferences() async {
@@ -29,12 +28,12 @@ Future<Map<String, dynamic>> getPreferences() async {
 }
 
 // Get current location.
-Future<Position> getHomeLocation() async {
+Future<Map<String, dynamic>> getHomeLocation() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  Position homeLocation = Position(
-      latitude: double.parse(prefs.getString('homeLat')),
-      longitude: double.parse(prefs.getString('homeLong')));
-
+  Map<String, dynamic> homeLocation = {
+    'latitude': double.parse(prefs.getString('homeLat')),
+    'longitude': double.parse(prefs.getString('homeLong'))
+  };
   return homeLocation;
 }
 

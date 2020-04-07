@@ -4,17 +4,21 @@ import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
-import 'package:quarantine_tracker/services/preferences.dart';
+import 'package:flutter_geofence/geofence.dart';
 
 var initScreen;
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  initScreen = await checkPreferences().then((haveRegistered) {
-    return haveRegistered ? '/' : 'register';
-  });
-  print('$initScreen');
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
+
+// Main for routing pages.
+
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   initScreen = await checkPreferences().then((haveRegistered) {
+//     return haveRegistered ? '/' : 'register';
+//   });
+//   print('$initScreen');
+//   runApp(MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   @override
@@ -38,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _platformVersion = 'Unknown';
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
   double lati = 13, long = 100;
@@ -64,20 +69,43 @@ class _MyHomePageState extends State<MyHomePage> {
       """);
 
       print(DateTime.now().toUtc().toString());
-      mqttClientWrapper.publishLocation(location.latitude, location.longitude);
+      // mqttClientWrapper.publishLocation(location.latitude, location.longitude);
     });
   }
 
   String latitude = "waiting...";
   String longitude = "waiting...";
-  String altitude = "waiting...";
-  String accuracy = "waiting...";
-  String bearing = "waiting...";
-  String speed = "waiting...";
+
+  void initPlatformState() {
+    Geofence.initialize();
+    Geofence.startListening(GeolocationEvent.entry, (entry) {
+      print('Entering ');
+      print(entry.id);
+      print(GeolocationEvent.values);
+    });
+
+    Geofence.startListening(GeolocationEvent.exit, (entry) {
+      print('Exiting ');
+      print(entry.id);
+      print(GeolocationEvent.values);
+    });
+
+    Geolocation location = Geolocation(
+        latitude: 13.6744122174,
+        longitude: 100.543417046,
+        radius: 25.0,
+        id: "home");
+    Geofence.addGeolocation(location, GeolocationEvent.entry).then((onValue) {
+      print("great success");
+    }).catchError((onError) {
+      print("great failure");
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    initPlatformState();
 
     BackgroundLocation.startLocationService();
     geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
@@ -90,8 +118,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return MaterialApp(
       home: Scaffold(
           body: QuarantineLocation(
-        lat: 13.608332,
-        lng: 100.716687,
+        lat: 13.6744122174,
+        lng: 100.543417046,
       )),
     );
   }

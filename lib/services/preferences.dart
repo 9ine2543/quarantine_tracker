@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> checkPreferences() async {
@@ -25,4 +26,22 @@ Future<Map<String, dynamic>> getPreferences() async {
   };
 
   return profiles;
+}
+
+// Get current location.
+Future<Position> getHomeLocation() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  Position homeLocation = Position(
+      latitude: double.parse(prefs.getString('homeLat')),
+      longitude: double.parse(prefs.getString('homeLong')));
+
+  return homeLocation;
+}
+
+// Get elapsed time by difference between current time and started date.
+Future<int> getElapsedTime() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var difference =
+      DateTime.now().difference(DateTime.parse(prefs.getString('startDate')));
+  return difference.inDays;
 }

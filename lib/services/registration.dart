@@ -57,6 +57,6 @@ Future<void> saveToSharedPreferences(
   prefs.setString('hospital', hospital);
   prefs.setInt('days', int.parse(days));
   prefs.setString('startDate', DateTime.now().toString());
-  prefs.setString('lat', '${lat}');
-  prefs.setString('lng', '${lng}');
+  prefs.setString('homeLat', '$lat');
+  prefs.setString('homeLong', '$lng');
 }

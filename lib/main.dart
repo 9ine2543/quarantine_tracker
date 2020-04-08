@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
+import 'package:quarantine_tracker/model/locationLog.dart';
+import 'package:quarantine_tracker/services/localDatabase.dart';
 import 'package:quarantine_tracker/services/preferences.dart';
 
 var initScreen;
 void main() => runApp(MyApp());
+
+// Comment for testing query page.
 // Future<void> main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
 //   initScreen = await checkPreferences().then((haveRegistered) {
@@ -41,6 +46,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
+  LocalSQL database = LocalSQL.db;
+  List queryResult = [];
   double lati = 13, long = 100;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
@@ -57,10 +64,28 @@ class _MyHomePageState extends State<MyHomePage> {
         this.long = location.longitude;
       });
 
+      print(DateTime.now().toUtc().toString());
       print("Latitude: $lati Longitude: $long");
 
-      print(DateTime.now().toUtc().toString());
+      LocationLog mockLog =
+          LocationLog(Random().nextInt(1000000), this.lati, this.long);
+
+      print(mockLog.toString());
+      database.insert(mockLog);
+      database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(location.latitude, location.longitude);
+    });
+  }
+
+  void getQuery(List<Map<String, dynamic>> res) {
+    print('List length: ${res.length}');
+    setState(() {
+      queryResult.clear();
+      queryResult.addAll(res);
+    });
+    print(queryResult.length);
+    queryResult.asMap().forEach((index, value) {
+      print(queryResult[index]);
     });
   }
 

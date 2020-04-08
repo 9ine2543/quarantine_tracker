@@ -46,6 +46,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   LocalDatabase database = LocalDatabase.db;
+  List queryResult = [];
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
   double lati = 13, long = 100;
@@ -75,8 +76,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
       LocationLog mockLog = LocationLog(Random().nextInt(1000000), lati, long);
       database.insert(mockLog);
+      database.logs().then((logs) => getQuery(logs));
 
       // mqttClientWrapper.publishLocation(location.latitude, location.longitude);
+    });
+  }
+
+  void getQuery(List<Map<String, dynamic>> res) {
+    print('List length: ${res.length}');
+    setState(() {
+      queryResult.clear();
+      queryResult.addAll(res);
+    });
+    print(queryResult.length);
+    queryResult.asMap().forEach((index, value) {
+      print(queryResult[index]);
     });
   }
 

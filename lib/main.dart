@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
+import 'package:quarantine_tracker/model/locationLog.dart';
+import 'package:quarantine_tracker/services/localDatabase.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
@@ -42,7 +45,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _platformVersion = 'Unknown';
+  LocalDatabase database = LocalDatabase.db;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
   double lati = 13, long = 100;
@@ -69,6 +72,10 @@ class _MyHomePageState extends State<MyHomePage> {
       """);
 
       print(DateTime.now().toUtc().toString());
+
+      LocationLog mockLog = LocationLog(Random().nextInt(1000000), lati, long);
+      database.insert(mockLog);
+
       // mqttClientWrapper.publishLocation(location.latitude, location.longitude);
     });
   }

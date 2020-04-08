@@ -14,10 +14,18 @@ class QuarantineLocation extends StatefulWidget {
 }
 
 class _QuarantineLocationState extends State<QuarantineLocation> {
-  Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController _controller;
 
   @override
   Widget build(BuildContext context) {
+
+    if(_controller != null){
+      _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: LatLng(widget.lat - 0.000068, widget.lng),
+        zoom: 18
+      )));
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
@@ -39,7 +47,7 @@ class _QuarantineLocationState extends State<QuarantineLocation> {
                   zoom: 18,
                 ),
                 onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
+                  _controller = controller;
                 },
               ),
               Align(

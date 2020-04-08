@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
+import 'package:quarantine_tracker/model/locationLog.dart';
+import 'package:quarantine_tracker/services/localDatabase.dart';
 import 'package:quarantine_tracker/services/preferences.dart';
 
 var initScreen;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initScreen = await checkPreferences().then((haveRegistered) {
@@ -40,6 +44,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
+  LocalSQL database = LocalSQL.db;
+  List queryResult = [];
   double lati = 13, long = 100;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
@@ -52,35 +58,41 @@ class _MyHomePageState extends State<MyHomePage> {
   void _getAndPublishLocation() {
     BackgroundLocation().getCurrentLocation().then((location) {
       setState(() {
-        this.latitude = location.latitude.toString();
-        this.longitude = location.longitude.toString();
         this.lati = location.latitude;
         this.long = location.longitude;
       });
 
-      print("""\n
-        Latitude:  $latitude
-        Longitude: $longitude
-      """);
-
       print(DateTime.now().toUtc().toString());
+      print("Latitude: $lati Longitude: $long");
+
+      LocationLog mockLog =
+          LocationLog(Random().nextInt(1000000), this.lati, this.long);
+
+      print(mockLog.toString());
+      database.insert(mockLog);
+      database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(location.latitude, location.longitude);
     });
   }
 
-  String latitude = "waiting...";
-  String longitude = "waiting...";
-  String altitude = "waiting...";
-  String accuracy = "waiting...";
-  String bearing = "waiting...";
-  String speed = "waiting...";
+  void getQuery(List<Map<String, dynamic>> res) {
+    print('List length: ${res.length}');
+    setState(() {
+      queryResult.clear();
+      queryResult.addAll(res);
+    });
+    print(queryResult.length);
+    queryResult.asMap().forEach((index, value) {
+      print(queryResult[index]);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-
+    mqttSetup();
     BackgroundLocation.startLocationService();
-    geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
+    geofetchTimer = Timer.periodic(Duration(seconds: 10), (Timer t) {
       _getAndPublishLocation();
     });
   }
@@ -90,16 +102,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return MaterialApp(
       home: Scaffold(
           body: QuarantineLocation(
-        lat: 13.608332,
-        lng: 100.716687,
+        lat: lati,
+        lng: long,
       )),
     );
-  }
-
-  getCurrentLocation() {
-    BackgroundLocation().getCurrentLocation().then((location) {
-      print("This is current Location" + location.longitude.toString());
-    });
   }
 
   @override

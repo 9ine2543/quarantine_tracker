@@ -2,14 +2,21 @@ class LocationLog {
   int id;
   double lat;
   double long;
-  DateTime timestamp = DateTime.now();
+  final DateTime timestamp = DateTime.now();
+  String status;
 
   LocationLog(this.id, this.lat, this.long);
 
   Map toJson() => {'Id': id, 'Lat': lat, 'Long': long};
 
-  Map<String, dynamic> toMap() =>
-      {'citizen_id': id, 'lat': lat, 'long': long, 'timestamp': timestamp};
+  Map<String, dynamic> toMap() {
+    return {
+      'lat': lat,
+      'long': long,
+      'ts': timestamp.toIso8601String(),
+      'status': status
+    };
+  }
 
   @override
   String toString() {

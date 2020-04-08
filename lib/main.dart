@@ -10,17 +10,15 @@ import 'package:quarantine_tracker/services/localDatabase.dart';
 import 'package:quarantine_tracker/services/preferences.dart';
 
 var initScreen;
-void main() => runApp(MyApp());
 
-// Comment for testing query page.
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   initScreen = await checkPreferences().then((haveRegistered) {
-//     return haveRegistered ? '/' : 'register';
-//   });
-//   print('$initScreen');
-//   runApp(MyApp());
-// }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  initScreen = await checkPreferences().then((haveRegistered) {
+    return haveRegistered ? '/' : 'register';
+  });
+  print('$initScreen');
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

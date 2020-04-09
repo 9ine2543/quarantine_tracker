@@ -35,4 +35,16 @@ class LocalSQL {
     final List<Map<String, dynamic>> maps = await db.query('logs');
     return maps;
   }
+
+  Future<List<Map<String, dynamic>>> logsByDate(
+      int year, int month, int date) async {
+    List<DateTime> range = [
+      new DateTime(year, month, date),
+      new DateTime(year, month, date, 23, 59, 59)
+    ];
+    final db = await database;
+    final List<Map> list = await db.rawQuery(
+        'SELECT * FROM logs WHERE ts BETWEEN ${range[0]} AND ${range[1]}');
+    return list;
+  }
 }

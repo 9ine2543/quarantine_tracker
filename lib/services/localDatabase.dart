@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:quarantine_tracker/model/locationLog.dart';
@@ -38,13 +38,11 @@ class LocalSQL {
 
   Future<List<Map<String, dynamic>>> logsByDate(
       int year, int month, int date) async {
-    List<DateTime> range = [
-      new DateTime(year, month, date),
-      new DateTime(year, month, date, 23, 59, 59)
-    ];
+    String range = DateFormat('yyyy-MM-dd').format(DateTime(year, month, date));
     final db = await database;
-    final List<Map> list = await db.rawQuery(
-        'SELECT * FROM logs WHERE ts BETWEEN ${range[0]} AND ${range[1]}');
+    String query = 'SELECT * FROM logs WHERE date(ts) = \'$range\'';
+    print(query);
+    final List<Map> list = await db.rawQuery(query);
     return list;
   }
 }

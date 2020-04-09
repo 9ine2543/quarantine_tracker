@@ -20,8 +20,8 @@ class LocalSQL {
     return await openDatabase(join(await getDatabasesPath(), 'location_log.db'),
         onCreate: (db, version) {
       return db.execute(
-          "CREATE TABLE logs(lat DOUBLE, long DOUBLE, ts DATETIME, status TEXT)");
-    }, version: 1);
+          "CREATE TABLE logs(lat DOUBLE, long DOUBLE, ts DATETIME, status INTEGER)");
+    }, version: 2);
   }
 
   Future<void> insert(LocationLog log) async {
@@ -44,5 +44,15 @@ class LocalSQL {
     print(query);
     final List<Map> list = await db.rawQuery(query);
     return list;
+  }
+
+  Future<List<Map<String, dynamic>>> countStatusByDate(
+      int status, int year, int month, int date) async {
+    final db = await database;
+    String range = DateFormat('yyyy-MM-dd').format(DateTime(year, month, date));
+    String query =
+        'SELECT COUNT(*) FROM logs WHERE date(ts) = \'$range\' AND status = $status';
+    final List<Map> count = await db.rawQuery(query);
+    return count;
   }
 }

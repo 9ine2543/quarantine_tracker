@@ -8,6 +8,7 @@ import 'package:quarantine_tracker/pages/quarantineLocation.dart';
 import 'package:quarantine_tracker/model/locationLog.dart';
 import 'package:quarantine_tracker/services/localDatabase.dart';
 import 'package:quarantine_tracker/services/preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 var initScreen;
 
@@ -46,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
       <StreamSubscription<dynamic>>[];
   LocalSQL database = LocalSQL.db;
   List queryResult = [];
-  double lati = 13, long = 100;
+  double lati = 13, long = 100, home_lat = 13.6082817, home_lng = 100.7166733, distance = 0;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
 
@@ -55,13 +56,19 @@ class _MyHomePageState extends State<MyHomePage> {
     mqttClientWrapper.prepareMqttClient();
   }
 
+  Future<void> _onCalculate() async {
+    distance = await Geolocator().distanceBetween(
+        home_lat, home_lng, lati, long);
+  }
+
+
   void _getAndPublishLocation() {
     BackgroundLocation().getCurrentLocation().then((location) {
       setState(() {
         this.lati = location.latitude;
         this.long = location.longitude;
       });
-
+      _onCalculate();
       print(DateTime.now().toUtc().toString());
       print("Latitude: $lati Longitude: $long");
 

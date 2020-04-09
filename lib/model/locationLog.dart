@@ -3,7 +3,7 @@ class LocationLog {
   double lat;
   double long;
   final DateTime timestamp = DateTime.now();
-  String status;
+  int status;
 
   LocationLog(this.id, this.lat, this.long);
 

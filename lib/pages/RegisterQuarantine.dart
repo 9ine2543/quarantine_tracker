@@ -83,7 +83,6 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
         child: ListView(
           children: <Widget>[
             RegisterHeading(),
-            
             Container(
               width: MediaQuery.of(context).size.width,
               height: boxHeight,

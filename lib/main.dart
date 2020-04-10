@@ -9,17 +9,36 @@ import 'package:quarantine_tracker/model/locationLog.dart';
 import 'package:quarantine_tracker/services/localDatabase.dart';
 import 'package:quarantine_tracker/services/preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:quarantine_tracker/pages/dashBoard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 var initScreen;
 
+String name, surname, hospital;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  name = prefs.getString('name');
+  surname = prefs.getString('surname');
+  hospital = prefs.getString('hospital');
+  print(hospital);
   initScreen = await checkPreferences().then((haveRegistered) {
     return haveRegistered ? '/' : 'register';
   });
   print('$initScreen');
   runApp(MyApp());
 }
+
+
+
+  // Future<void> getValueForDashboard() async{
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   name = prefs.getString('name');
+  //   surname = prefs.getString('surname');
+  //   hospital = prefs.getString('hospital');
+  //   print(name);
+  // }
 
 class MyApp extends StatelessWidget {
   @override
@@ -47,10 +66,9 @@ class _MyHomePageState extends State<MyHomePage> {
       <StreamSubscription<dynamic>>[];
   LocalSQL database = LocalSQL.db;
   List queryResult = [];
-  double lati = 13, long = 100, home_lat = 13.6082817, home_lng = 100.7166733, distance = 0;
+  double lati , long , home_lat = 13.6082817, home_lng = 100.7166733, distance = 0;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
-
   void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
     mqttClientWrapper.prepareMqttClient();
@@ -61,6 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
         home_lat, home_lng, lati, long);
   }
 
+  // String name, surname, hospital;
+
+  // Future<void> getValueForDashboard() async{
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   name = prefs.getString('name');
+  //   surname = prefs.getString('surname');
+  //   hospital = prefs.getString('hospital');
+  //   print(name);
+  // }
 
   void _getAndPublishLocation() {
     BackgroundLocation().getCurrentLocation().then((location) {
@@ -108,10 +135,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          body: QuarantineLocation(
-        lat: lati,
-        lng: long,
-      )),
+      //     body: QuarantineLocation(
+      //   lat: lati,
+      //   lng: long,
+      // )),
+      body: name != null ? dashBoardMain(name:name, surname: surname,hospital: hospital,) : QuarantineLocation(lat: home_lat,lng: home_lng,)
+      )
     );
   }
 

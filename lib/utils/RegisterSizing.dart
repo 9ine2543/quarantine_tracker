@@ -1,11 +1,11 @@
 double getRegisterFormSizing(value) {
   switch (value) {
     case '1':
-      return 800;
+      return 888;
     case '2':
-      return 1070;
+      return 1158;
     default:
-      return 600;
+      return 688;
   }
 }
 

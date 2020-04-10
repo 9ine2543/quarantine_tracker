@@ -6,6 +6,7 @@ import 'package:quarantine_tracker/widgets/register/formHeading.dart';
 import 'package:quarantine_tracker/widgets/register/formInput.dart';
 import 'package:quarantine_tracker/services/registration.dart';
 import 'package:geolocator/geolocator.dart';
+import 'addHomeLocation.dart';
 
 class RegisterQuarantine extends StatefulWidget {
   @override
@@ -20,12 +21,21 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
   String hospital, patientName, patientSurname, patientCitizenId;
   Position _currentPosition;
   Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-
+  String _title = 'โปรดเลือกที่อยู่อาศัย';
   @override
   void initState() {
     super.initState();
 
     _getCurrentLocation();
+  }
+
+  void moveToAddHome() async {
+    final information = await Navigator.push(context,MaterialPageRoute(builder: (context) => addHomeLocation(current: _currentPosition,)));
+
+    if(information[0] != null){
+      _title = '${information[0]}:${information[1]}';
+    }
+
   }
 
   @override
@@ -142,6 +152,29 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                         }),
                     SizedBox(
                       height: 10,
+                    ),
+                    FormHeading(heading: 'ที่อยู่อาศัย'),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                      ),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey[300]),
+                          borderRadius: BorderRadius.horizontal(
+                              left: Radius.circular(40), right: Radius.circular(40))),
+                      child: FlatButton(
+                        onPressed: (){
+                          moveToAddHome();
+                        }, 
+                        child: Text(_title)
+                      )
                     ),
                     FormHeading(heading: 'รหัสหน่วยงานที่ดูแล'),
                     SizedBox(

@@ -22,6 +22,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
   Position _currentPosition;
   Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   String _title = 'โปรดเลือกที่อยู่อาศัย';
+  double homelat,homelng;
   @override
   void initState() {
     super.initState();
@@ -34,6 +35,8 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
 
     if(information[0] != null){
       _title = 'ระบบเก็บที่อยู่ของคุณเรียบร้อยแล้ว';
+      homelat = information[0];
+      homelng = information[1];
     }
 
   }
@@ -80,9 +83,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
         child: ListView(
           children: <Widget>[
             RegisterHeading(),
-            SizedBox(
-              height: 15,
-            ),
+            
             Container(
               width: MediaQuery.of(context).size.width,
               height: boxHeight,
@@ -390,7 +391,9 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                               hospital: hospital,
                               days: days,
                               lat: _currentPosition.latitude,
-                              lng: _currentPosition.longitude);
+                              lng: _currentPosition.longitude,
+                              home_lat: homelat,
+                              home_lng: homelng);
                           saveToSharedPreferences(
                               citizenId: citizenId,
                               name: name,
@@ -399,9 +402,10 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                               organization: organization,
                               days: days,
                               lat: _currentPosition.latitude,
-                              lng: _currentPosition.longitude);
+                              lng: _currentPosition.longitude,
+                              home_lat: homelat,
+                              home_lng: homelng);
                           
-                          print(_currentPosition);
                           Navigator.pushNamed(context, '/');
                         },
                         child: Text(

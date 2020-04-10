@@ -14,7 +14,9 @@ Future<int> sendPayloadForRegister(
     String hospital,
     String days,
     double lat,
-    double lng}) async {
+    double lng,
+    double home_lat,
+    double home_lng}) async {
   var client = http.Client();
   try {
     var response = await client.post(url,
@@ -28,7 +30,9 @@ Future<int> sendPayloadForRegister(
           "Hospital": hospital,
           "Duration": int.parse(days),
           "Lat": lat,
-          "Lon": lng
+          "Lon": lng,
+          "Home_lat": home_lat,
+          "Home_lng": home_lng,
         }),
         headers: {"Content-Type": "application/json"});
     final int statusCode = response.statusCode;
@@ -48,7 +52,9 @@ Future<void> saveToSharedPreferences(
     String hospital,
     String days,
     double lat,
-    double lng}) async {
+    double lng,
+    double home_lat,
+    double home_lng}) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('organization', organization);
   prefs.setString('citizenId', citizenId);
@@ -57,6 +63,8 @@ Future<void> saveToSharedPreferences(
   prefs.setString('hospital', hospital);
   prefs.setInt('days', int.parse(days));
   prefs.setString('startDate', DateTime.now().toString());
-  prefs.setString('homeLat', '$lat');
-  prefs.setString('homeLong', '$lng');
+  prefs.setString('Lat', '$lat');
+  prefs.setString('Long', '$lng');
+  prefs.setString('homeLat', '$home_lat');
+  prefs.setString('homeLong', '$home_lng');
 }

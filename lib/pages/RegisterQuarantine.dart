@@ -33,7 +33,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
     final information = await Navigator.push(context,MaterialPageRoute(builder: (context) => addHomeLocation(current: _currentPosition,)));
 
     if(information[0] != null){
-      _title = '${information[0]}:${information[1]}';
+      _title = 'ระบบเก็บที่อยู่ของคุณเรียบร้อยแล้ว';
     }
 
   }

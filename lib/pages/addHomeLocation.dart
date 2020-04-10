@@ -104,7 +104,8 @@ class _addHomeLocationState extends State<addHomeLocation> {
                         BorderRadius.vertical(top: Radius.circular(40))),
                 child:FlatButton(
                 onPressed: () {
-                  _getCurrentLocation();
+                  
+                  Navigator.pop(context,[latitude,longitude]);
                 },
                 child: Text(
                   'ยืนยัน',

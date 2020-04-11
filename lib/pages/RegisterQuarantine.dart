@@ -238,7 +238,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                                   height: 10,
                                 ),
                                 FormInput(
-                                    dataType: 'text',
+                                    dataType: 'hospital',
                                     onChange: (input) {
                                       setState(() {
                                         hospital = input;

@@ -62,7 +62,9 @@ Future<void> saveToSharedPreferences(
   prefs.setString('surname', surname);
   prefs.setString('hospital', hospital);
   prefs.setInt('days', int.parse(days));
-  prefs.setString('startDate', DateTime.now().toString());
+  prefs.setString('startDate', DateTime.now().toString().replaceRange(11, 25, '00:00:00.000000'));
+  String _startDate = prefs.getString('startDate');
+  prefs.setStringList('listData[0]', ['1', '${_startDate[8]}${_startDate[9]}/${_startDate[5]}${_startDate[6]}/${DateTime.now().year + 543}', '0', '0']);
   prefs.setString('Lat', '$lat');
   prefs.setString('Long', '$lng');
   prefs.setString('homeLat', '$home_lat');

@@ -92,6 +92,27 @@ class _FormInput extends State<FormInput> {
             ],
           ),
         );
+        case 'hospital':
+        return Container(
+            height: 50,
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+            ),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey[300]),
+                borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(40), right: Radius.circular(40))),
+            child: TextField(
+              controller: inputController,
+              decoration: InputDecoration(border: InputBorder.none, hintText: 'ไม่ต้องใส่คำว่า "โรงพยาบาล"'),
+              keyboardType: TextInputType.text,
+              inputFormatters: [
+                WhitelistingTextInputFormatter(RegExp("[A-Za-zก-๙ ]")),
+                BlacklistingTextInputFormatter(RegExp("[๐-๙]"))
+              ],
+            ));
       default:
         return null;
     }

@@ -117,8 +117,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       LocationLog mockLog =
           LocationLog(Random().nextInt(1000000), this.lati, this.long);
-
-      print(mockLog.toString());
+      print('distance: ${distance}');
+      // print(mockLog.toString());
       database.insert(mockLog);
       database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(location.latitude, location.longitude);
@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     print(queryResult.length);
     queryResult.asMap().forEach((index, value) {
-      print(queryResult[index]);
+      // print(queryResult[index]);
     });
   }
 
@@ -142,8 +142,12 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     mqttSetup();
     BackgroundLocation.startLocationService();
-    
-    geofetchTimer = Timer.periodic(Duration(seconds: 10), (Timer t) {
+    if(name == null){
+      geofetchTimer = Timer.periodic(Duration(seconds: 15), (Timer t) {
+        _getAndPublishLocation();
+      });
+    }
+    geofetchTimer = Timer.periodic(Duration(seconds: 15), (Timer t) {
       _getAndPublishLocation();
     });
   }

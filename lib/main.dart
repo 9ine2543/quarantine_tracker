@@ -22,31 +22,31 @@ List listData = [];
 bool _haveRegistered = false;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    
+
   initScreen = await checkPreferences().then((haveRegistered) {
     _haveRegistered = haveRegistered;
     return haveRegistered ? '/' : 'register';
   });
   print('$initScreen');
-  if(initScreen == '/'){
+  if (initScreen == '/') {
     getValueForDashboard();
   }
   runApp(MyApp());
 }
 
-Future<void> getValueForDashboard() async{
+Future<void> getValueForDashboard() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   name = prefs.getString('name');
   surname = prefs.getString('surname');
   hospital = prefs.getString('hospital');
   _startDate = prefs.getString('startDate');
   days = DateTime.now().difference(DateTime.parse(_startDate));
-  for(int i = 0; i < days.inDays + 1;i++){
-    listData.insert(0,prefs.getStringList('listData[${i}]'));
+  for (int i = 0; i < days.inDays + 1; i++) {
+    listData.insert(0, prefs.getStringList('listData[${i}]'));
   }
 }
 
-Future<void> setValuePreferences(List<String> dataList, int index) async{
+Future<void> setValuePreferences(List<String> dataList, int index) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setStringList('listData[${index}]', dataList);
 }
@@ -77,18 +77,25 @@ class _MyHomePageState extends State<MyHomePage> {
       <StreamSubscription<dynamic>>[];
   LocalSQL database = LocalSQL.db;
   List queryResult = [];
-  double lati , long , home_lat = 13.6082817, home_lng = 100.7166733, distance = 0;
+  double lati,
+      long,
+      home_lat = 13.6082817,
+      home_lng = 100.7166733,
+      distance = 0;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
+  int status;
+  int id;
   void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
     mqttClientWrapper.prepareMqttClient();
   }
 
   Future<void> _onCalculate() async {
-    distance = await Geolocator().distanceBetween(
-        home_lat, home_lng, lati, long);
+    distance =
+        await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
   }
+
   void _getAndPublishLocation() {
     BackgroundLocation().getCurrentLocation().then((location) {
       setState(() {
@@ -96,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
         this.long = location.longitude;
       });
       _onCalculate();
-      if(name == null){
+      if (name == null) {
         getValueForDashboard();
         print(name);
       }
@@ -104,24 +111,50 @@ class _MyHomePageState extends State<MyHomePage> {
       print("Latitude: $lati Longitude: $long");
       days = DateTime.now().difference(DateTime.parse(_startDate));
       print(days);
-      if(days.inDays == listData.length){
-        setValuePreferences(['${days.inDays + 1}', '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}', '0', '0'], listData.length);
-        if(DateTime.now().day > 9 && DateTime.now().month > 9)
-          listData.insert(0, ['${days.inDays + 1}', '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}', '0', '0']);
-        else if(DateTime.now().day > 9 && DateTime.now().month < 10)
-          listData.insert(0, ['${days.inDays + 1}', '${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}', '0', '0']);
-        else if(DateTime.now().day < 10 && DateTime.now().month > 9)
-          listData.insert(0, ['${days.inDays + 1}', '0${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}', '0', '0']);
-        else if(DateTime.now().day < 10 && DateTime.now().month < 10)
-          listData.insert(0, ['${days.inDays + 1}', '0${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}', '0', '0']);
+      if (days.inDays == listData.length) {
+        setValuePreferences([
+          '${days.inDays + 1}',
+          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
+          '0',
+          '0'
+        ], listData.length);
+        if (DateTime.now().day > 9 && DateTime.now().month > 9)
+          listData.insert(0, [
+            '${days.inDays + 1}',
+            '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
+            '0',
+            '0'
+          ]);
+        else if (DateTime.now().day > 9 && DateTime.now().month < 10)
+          listData.insert(0, [
+            '${days.inDays + 1}',
+            '${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
+            '0',
+            '0'
+          ]);
+        else if (DateTime.now().day < 10 && DateTime.now().month > 9)
+          listData.insert(0, [
+            '${days.inDays + 1}',
+            '0${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
+            '0',
+            '0'
+          ]);
+        else if (DateTime.now().day < 10 && DateTime.now().month < 10)
+          listData.insert(0, [
+            '${days.inDays + 1}',
+            '0${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
+            '0',
+            '0'
+          ]);
       }
-      LocationLog mockLog =
-          LocationLog(Random().nextInt(1000000), this.lati, this.long);
+      LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
+          this.long, this.status, this.distance);
       print('distance: ${distance}');
       // print(mockLog.toString());
       database.insert(mockLog);
       database.logs().then((logs) => getQuery(logs));
-      mqttClientWrapper.publishLocation(location.latitude, location.longitude);
+      mqttClientWrapper.publishLocation(
+          this.id, location.latitude, location.longitude, this.status);
     });
   }
 
@@ -142,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     mqttSetup();
     BackgroundLocation.startLocationService();
-    if(name == null){
+    if (name == null) {
       geofetchTimer = Timer.periodic(Duration(seconds: 15), (Timer t) {
         _getAndPublishLocation();
       });
@@ -155,10 +188,20 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: name != null ? dashBoardMain(name:name, surname: surname, hospital: hospital, days: days.inDays + 1, listData: listData, total_away: total_away, total_lost: total_lost) : QuarantineLocation(lat: home_lat,lng: home_lng,)
-      )
-    );
+        home: Scaffold(
+            body: name != null
+                ? dashBoardMain(
+                    name: name,
+                    surname: surname,
+                    hospital: hospital,
+                    days: days.inDays + 1,
+                    listData: listData,
+                    total_away: total_away,
+                    total_lost: total_lost)
+                : QuarantineLocation(
+                    lat: home_lat,
+                    lng: home_lng,
+                  )));
   }
 
   @override

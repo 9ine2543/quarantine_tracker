@@ -20,8 +20,8 @@ class LocalSQL {
     return await openDatabase(join(await getDatabasesPath(), 'location_log.db'),
         onCreate: (db, version) {
       return db.execute(
-          "CREATE TABLE logs(lat DOUBLE, long DOUBLE, ts DATETIME, status INTEGER)");
-    }, version: 2);
+          "CREATE TABLE logs(lat DOUBLE, long DOUBLE, ts DATETIME, status INTEGER, distance DOUBLE)");
+    }, version: 3);
   }
 
   Future<void> insert(LocationLog log) async {

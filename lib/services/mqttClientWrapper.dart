@@ -18,8 +18,8 @@ class MQTTClientWrapper {
   }
 
   // Currently publish sample payload.
-  void publishLocation(double latitude, double longitude) {
-    LocationLog sample = LocationLog(1102501543184, latitude, longitude);
+  void publishLocation(int id, double latitude, double longitude, int status) {
+    LocationLog sample = LocationLog(id, latitude, longitude, status, 0);
     String locationJson = jsonEncode(sample);
     _publishMessage(locationJson);
   }

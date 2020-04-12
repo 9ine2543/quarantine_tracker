@@ -16,12 +16,12 @@ class LocationLog {
       'long': long,
       'ts': timestamp.toIso8601String(),
       'status': status,
-      'distance': distance
+      // 'distance': distance
     };
   }
 
   @override
   String toString() {
-    return 'LocationLog{Id: $id, latitude: $lat, longitude: $long, timestamp: $timestamp}';
+    return 'LocationLog{Id: $id, latitude: $lat, longitude: $long, timestamp: $timestamp, distance: $distance}';
   }
 }

@@ -67,6 +67,8 @@ Future<void> saveToSharedPreferences(
   prefs.setStringList('listData[0]', ['1', '${_startDate[8]}${_startDate[9]}/${_startDate[5]}${_startDate[6]}/${DateTime.now().year + 543}', '0', '0']);
   prefs.setString('Lat', '$lat');
   prefs.setString('Long', '$lng');
-  prefs.setString('homeLat', '$home_lat');
-  prefs.setString('homeLong', '$home_lng');
+  prefs.setDouble('homeLat', home_lat);
+  prefs.setDouble('homeLong', home_lng);
+  prefs.setInt('totalAway', 0);
+  prefs.setInt('totalLost', 0);
 }

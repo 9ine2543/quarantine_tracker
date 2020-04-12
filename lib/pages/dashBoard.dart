@@ -15,8 +15,6 @@ class dashBoardMain extends StatefulWidget {
 
 class _dashBoardMainState extends State<dashBoardMain> {
 
-  List fakeData = [[1, '22/03/2563', 0, 0], [2, '23/03/2563', 0, 0], [3, '24/03/2563', 10, 0], [4, '25/03/2563', 88, 88]];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

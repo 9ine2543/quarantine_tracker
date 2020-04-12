@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
+import 'package:http/http.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
@@ -11,20 +12,21 @@ import 'package:quarantine_tracker/services/preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quarantine_tracker/pages/dashBoard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:quarantine_tracker/services/preferences.dart';
 
 var initScreen;
 
 String name, surname, hospital, _startDate;
+double home_lat , home_lng ;
 var days;
-int total_away = 0, total_lost = 0;
+int total_away = 0, total_lost = 0, awayinDay = 0, lostinDay = 0;
+bool inHome = false;
 List listData = [];
-bool _haveRegistered = false;
+Position _currentPosition = Position(latitude: 0, longitude: 0);
+
+Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   initScreen = await checkPreferences().then((haveRegistered) {
-    _haveRegistered = haveRegistered;
     return haveRegistered ? '/' : 'register';
   });
   print('$initScreen');
@@ -40,15 +42,39 @@ Future<void> getValueForDashboard() async {
   surname = prefs.getString('surname');
   hospital = prefs.getString('hospital');
   _startDate = prefs.getString('startDate');
+  home_lat = prefs.getDouble('homeLat');
+  home_lng = prefs.getDouble('homeLong');
+  total_away = prefs.getInt('totalAway');
+  total_lost = prefs.getInt('totalLost');
   days = DateTime.now().difference(DateTime.parse(_startDate));
   for (int i = 0; i < days.inDays + 1; i++) {
-    listData.insert(0, prefs.getStringList('listData[${i}]'));
+    if(prefs.getStringList('listData[$i]') == null)
+    {
+      setValuePreferences([
+          '${days.inDays + 1}',
+          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
+          '$awayinDay',
+          '$lostinDay'
+        ], i);
+    }
+    listData.insert(0, prefs.getStringList('listData[$i]'));
+    if(i == days.inDays){ //current
+      awayinDay = int.parse(listData[0][2]);
+      lostinDay = int.parse(listData[0][3]);
+    }
   }
+  print(home_lat);
+}
+
+Future<void> saveTotalValue(int away, int lost) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt('totalAway', away);
+  prefs.setInt('totalLost', lost);
 }
 
 Future<void> setValuePreferences(List<String> dataList, int index) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setStringList('listData[${index}]', dataList);
+  prefs.setStringList('listData[$index]', dataList);
 }
 
 class MyApp extends StatelessWidget {
@@ -79,12 +105,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List queryResult = [];
   double lati,
       long,
-      home_lat = 13.6082817,
-      home_lng = 100.7166733,
       distance = 0;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
-  int status;
+  int status = 4; //default
   int id;
   void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
@@ -92,8 +116,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _onCalculate() async {
-    distance =
-        await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
+    distance = await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
+    if(distance < 1){//idle
+      status = 4;
+      inHome = true;
+    }
+    else if(distance <= 15){// normal
+      status = 1;
+      inHome = true;
+    }
+    else //away
+      status = 2;
   }
 
   void _getAndPublishLocation() {
@@ -102,55 +135,66 @@ class _MyHomePageState extends State<MyHomePage> {
         this.lati = location.latitude;
         this.long = location.longitude;
       });
-      _onCalculate();
       if (name == null) {
         getValueForDashboard();
         print(name);
       }
+      
       print(DateTime.now().toUtc().toString());
       print("Latitude: $lati Longitude: $long");
       days = DateTime.now().difference(DateTime.parse(_startDate));
       print(days);
       if (days.inDays == listData.length) {
+        awayinDay = 0;
+        lostinDay = 0;
         setValuePreferences([
           '${days.inDays + 1}',
           '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
-          '0',
-          '0'
+          '$awayinDay',
+          '$lostinDay'
         ], listData.length);
         if (DateTime.now().day > 9 && DateTime.now().month > 9)
           listData.insert(0, [
             '${days.inDays + 1}',
             '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
-            '0',
-            '0'
+            '$awayinDay',
+            '$lostinDay'
           ]);
         else if (DateTime.now().day > 9 && DateTime.now().month < 10)
           listData.insert(0, [
             '${days.inDays + 1}',
             '${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
-            '0',
-            '0'
+            '$awayinDay',
+            '$lostinDay'
           ]);
         else if (DateTime.now().day < 10 && DateTime.now().month > 9)
           listData.insert(0, [
             '${days.inDays + 1}',
             '0${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
-            '0',
-            '0'
+            '$awayinDay',
+            '$lostinDay'
           ]);
         else if (DateTime.now().day < 10 && DateTime.now().month < 10)
           listData.insert(0, [
             '${days.inDays + 1}',
             '0${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
-            '0',
-            '0'
+            '$awayinDay',
+            '$lostinDay'
           ]);
       }
+      _onCalculate();
+      if(status == 2 && inHome == true){
+        awayinDay += 1;
+        total_away += 1;
+        inHome = false;
+      }
+      saveTotalValue(total_away, total_lost);
+      listData[0][2] = '$awayinDay';
+      setValuePreferences(listData[0], listData.length - 1);
       LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
           this.long, this.status, this.distance);
-      print('distance: ${distance}');
-      // print(mockLog.toString());
+      print('distance: $distance');
+      print(mockLog.toString());
       database.insert(mockLog);
       database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(
@@ -173,6 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _getCurrentLocation();
     mqttSetup();
     BackgroundLocation.startLocationService();
     if (name == null) {
@@ -199,13 +244,31 @@ class _MyHomePageState extends State<MyHomePage> {
                     total_away: total_away,
                     total_lost: total_lost)
                 : QuarantineLocation(
-                    lat: home_lat,
-                    lng: home_lng,
+                    lat: _currentPosition.latitude,
+                    lng: _currentPosition.longitude,
                   )));
+  }
+
+  void _getCurrentLocation() {
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        _currentPosition = position;
+      });
+    }).catchError((e) {
+      print(e);
+    });
   }
 
   @override
   void dispose() {
+    status = 3;
+    total_lost += 1;
+    lostinDay += 1;
+    saveTotalValue(total_away, total_lost);
+    listData[0][3] = '$lostinDay';
+    setValuePreferences(listData[0], listData.length - 1);
     BackgroundLocation.stopLocationService();
     for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
       subscription.cancel();

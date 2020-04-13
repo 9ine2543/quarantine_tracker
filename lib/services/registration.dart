@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-final String url = "http://203.151.51.75:8008";
+final String url = "http://203.151.51.75:8008";//http://203.151.51.75:8008
 
 Future<int> sendPayloadForRegister(
     {String organization,
@@ -58,6 +58,7 @@ Future<void> saveToSharedPreferences(
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('organization', organization);
   prefs.setString('citizenId', citizenId);
+  prefs.setInt('id', int.parse(citizenId));
   prefs.setString('name', name);
   prefs.setString('surname', surname);
   prefs.setString('hospital', hospital);

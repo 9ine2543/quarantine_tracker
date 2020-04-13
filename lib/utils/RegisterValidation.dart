@@ -1,10 +1,10 @@
 bool validateGeneralInputs(
-    firstname, surname, citizenId, phoneNumber, organization) {
+    firstname, surname, String citizenId, String phoneNumber, String organization) {
   if (firstname != '' &&
       surname != '' &&
-      citizenId != '' &&
-      phoneNumber != '' &&
-      organization != '') {
+      citizenId.length == 13 &&
+      phoneNumber.length == 10 &&
+      organization.length == 4) {
     return true;
   } else {
     return false;

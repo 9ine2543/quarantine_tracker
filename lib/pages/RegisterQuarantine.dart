@@ -17,7 +17,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
   bool _canConfirm, typeOne, typeTwo;
   String _value;
   double boxHeight;
-  String name, surname, citizenId, phoneNumber, organization, days;
+  String name, surname, citizenId = '', phoneNumber = '', organization = '', days;
   String hospital, patientName, patientSurname, patientCitizenId;
   Position _currentPosition;
   Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
@@ -38,7 +38,6 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
       homelat = information[0];
       homelng = information[1];
     }
-
   }
 
   @override
@@ -144,7 +143,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                       height: 10,
                     ),
                     FormInput(
-                        dataType: 'number',
+                        dataType: 'phone',
                         onChange: (input) {
                           setState(() {
                             phoneNumber = input;
@@ -181,7 +180,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                       height: 10,
                     ),
                     FormInput(
-                        dataType: 'number',
+                        dataType: 'pin',
                         onChange: (input) {
                           setState(() {
                             organization = input;
@@ -380,7 +379,6 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                     ? FlatButton(
                         onPressed: () {
                           _getCurrentLocation();
-
                           sendPayloadForRegister(
                               citizenId: citizenId,
                               name: name,
@@ -404,7 +402,6 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                               lng: _currentPosition.longitude,
                               home_lat: homelat,
                               home_lng: homelng);
-                          
                           Navigator.pushNamed(context, '/');
                         },
                         child: Text(

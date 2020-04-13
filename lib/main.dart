@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:background_location/background_location.dart';
 import 'package:http/http.dart';
+import 'package:quarantine_tracker/model/mqtt.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
@@ -12,11 +15,13 @@ import 'package:quarantine_tracker/services/preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quarantine_tracker/pages/dashBoard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity/connectivity.dart';
 
 var initScreen;
-
+LocalSQL database = LocalSQL.db;
 String name, surname, hospital, _startDate;
-double home_lat , home_lng ;
+double home_lat , home_lng;
+int id;
 var days;
 int total_away = 0, total_lost = 0, awayinDay = 0, lostinDay = 0;
 bool inHome = false;
@@ -46,6 +51,7 @@ Future<void> getValueForDashboard() async {
   home_lng = prefs.getDouble('homeLong');
   total_away = prefs.getInt('totalAway');
   total_lost = prefs.getInt('totalLost');
+  id = prefs.getInt('id');
   days = DateTime.now().difference(DateTime.parse(_startDate));
   List<String> start_date = [_startDate.substring(0,4), _startDate.substring(5,7), _startDate.substring(8,10)];
   print(start_date);
@@ -55,6 +61,9 @@ Future<void> getValueForDashboard() async {
       total_lost += 1;
       lostinDay = 1;
       DateTime _date =  DateTime(int.parse(start_date[0]), int.parse(start_date[1]), int.parse(start_date[2])+i);
+      if(i != days.inDays){
+        database.insert(LocationLog(0, null, null, 3, null, _date));
+      }
       if (_date.day > 9 && _date.month > 9)
           listData.insert(0,[
           '${i + 1}',
@@ -110,6 +119,7 @@ Future<void> saveTotalValue(int away, int lost) async {
 Future<void> setValuePreferences(List<String> dataList, int index) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setStringList('listData[$index]', dataList);
+
 }
 
 class MyApp extends StatelessWidget {
@@ -134,34 +144,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool isConnected = true;
+  ConnectivityResult _connectivity ;
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
-  LocalSQL database = LocalSQL.db;
   List queryResult = [];
   double lati,
       long,
       distance = 0;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
-  int status = 4; //default
-  int id;
+  int status = 1; //default
   void mqttSetup() {
     mqttClientWrapper = MQTTClientWrapper();
     mqttClientWrapper.prepareMqttClient();
   }
 
+
   Future<void> _onCalculate() async {
     distance = await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
-    if(distance < 1){//idle
-      status = 4;
-      inHome = true;
-    }
-    else if(distance <= 15){// normal
-      status = 1;
+    if(distance <= 15){// normal
+      if(isConnected){
+        status = 1;
+      }
+      else
+        status = 11;
       inHome = true;
     }
     else //away
-      status = 2;
+      if(isConnected){
+        status = 2;
+      }
+      else
+        status = 22;
   }
 
   void _getAndPublishLocation() {
@@ -175,6 +192,18 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       });
       
+      _connectivitySubscription == Connectivity().onConnectivityChanged.listen((ConnectivityResult result){
+        print(result);
+        _connectivity = result;
+        if(result == ConnectivityResult.none){ //ปิดเน็ต
+          if(isConnected){
+            lostinDay += 1;
+            total_lost += 1;
+          }
+          isConnected = false;
+        }
+      });
+
       print(DateTime.now().toUtc().toString());
       print("Latitude: $lati Longitude: $long");
       days = DateTime.now().difference(DateTime.parse(_startDate));
@@ -225,13 +254,19 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       saveTotalValue(total_away, total_lost);
       listData[0][2] = '$awayinDay';
+      listData[0][3] = '$lostinDay';
       setValuePreferences(listData[0], listData.length - 1);
+      if(_connectivity != ConnectivityResult.none && isConnected == false){
+        mqttSetup();
+        isConnected = true;
+      }
       LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
-          this.long, this.status, this.distance);
+          this.long, this.status, this.distance, DateTime.now());
+      print(mqttClientWrapper.connectionState);
       database.insert(mockLog);
       database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(
-          this.id, location.latitude, location.longitude, this.status);
+          id, location.latitude, location.longitude, this.status);
     });
   }
   void getQuery(List<Map<String, dynamic>> res) {
@@ -250,7 +285,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    mqttSetup();
+    _connectivitySubscription == Connectivity().onConnectivityChanged.listen((ConnectivityResult result){
+      print(result);
+      if(result == ConnectivityResult.none){ //ปิดเน็ต
+        if(isConnected){
+          lostinDay += 1;
+          total_lost += 1;
+        }
+        isConnected = false;
+      }
+      _connectivity = result;
+    });
+    if(isConnected)
+      mqttSetup();
     BackgroundLocation.startLocationService();
       geofetchTimer = Timer.periodic(Duration(seconds: 5), (Timer t) {
         _getAndPublishLocation();
@@ -294,6 +341,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
       subscription.cancel();
     }
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 }

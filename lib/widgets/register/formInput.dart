@@ -62,10 +62,56 @@ class _FormInput extends State<FormInput> {
                   left: Radius.circular(40), right: Radius.circular(40))),
           child: TextField(
             controller: inputController,
-            decoration: InputDecoration(border: InputBorder.none),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              ),
             keyboardType: TextInputType.number,
             inputFormatters: [
               LengthLimitingTextInputFormatter(13),
+              WhitelistingTextInputFormatter.digitsOnly
+            ],
+          ),
+        );
+      case 'phone':
+        return Container(
+          height: 50,
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+          ),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey[300]),
+              borderRadius: BorderRadius.horizontal(
+                  left: Radius.circular(40), right: Radius.circular(40))),
+          child: TextField(
+            controller: inputController,
+            decoration: InputDecoration(border: InputBorder.none,),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(10),
+              WhitelistingTextInputFormatter.digitsOnly
+            ],
+          ),
+        );
+      case 'pin':
+        return Container(
+          height: 50,
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+          ),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey[300]),
+              borderRadius: BorderRadius.horizontal(
+                  left: Radius.circular(40), right: Radius.circular(40))),
+          child: TextField(
+            controller: inputController,
+            decoration: InputDecoration(border: InputBorder.none),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(4),
               WhitelistingTextInputFormatter.digitsOnly
             ],
           ),

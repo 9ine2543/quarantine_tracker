@@ -2,11 +2,11 @@ class LocationLog {
   int id;
   double lat;
   double long;
-  final DateTime timestamp = DateTime.now();
+  DateTime timestamp;
   int status;
   double distance;
 
-  LocationLog(this.id, this.lat, this.long, this.status, this.distance);
+  LocationLog(this.id, this.lat, this.long, this.status, this.distance, this.timestamp);
 
   Map toJson() => {'Id': id, 'Lat': lat, 'Long': long, 'Status': status};
 

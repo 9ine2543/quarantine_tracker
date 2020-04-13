@@ -16,7 +16,7 @@ class LocationLog {
       'long': long,
       'ts': timestamp.toIso8601String(),
       'status': status,
-      // 'distance': distance
+      'distance': distance
     };
   }
 

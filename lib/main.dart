@@ -47,20 +47,55 @@ Future<void> getValueForDashboard() async {
   total_away = prefs.getInt('totalAway');
   total_lost = prefs.getInt('totalLost');
   days = DateTime.now().difference(DateTime.parse(_startDate));
+  List<String> start_date = [_startDate.substring(0,4), _startDate.substring(5,7), _startDate.substring(8,10)];
+  print(start_date);
   for (int i = 0; i < days.inDays + 1; i++) {
     if(prefs.getStringList('listData[$i]') == null)
     {
-      setValuePreferences([
-          '${days.inDays + 1}',
-          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
-          '$awayinDay',
+      total_lost += 1;
+      lostinDay = 1;
+      DateTime _date =  DateTime(int.parse(start_date[0]), int.parse(start_date[1]), int.parse(start_date[2])+i);
+      if (_date.day > 9 && _date.month > 9)
+          listData.insert(0,[
+          '${i + 1}',
+          '${_date.day}/${_date.month}/${_date.year + 543}',
+          '0',
           '$lostinDay'
-        ], i);
+        ]);
+        else if (_date.day > 9 && _date.month < 10)
+          listData.insert(0,[
+          '${i + 1}',
+          '${_date.day}/0${_date.month}/${_date.year + 543}',
+          '0',
+          '$lostinDay'
+        ]);
+        else if (_date.day < 10 && _date.month > 9)
+          listData.insert(0,[
+          '${i + 1}',
+          '0${_date.day}/${_date.month}/${_date.year + 543}',
+          '0',
+          '$lostinDay'
+        ]);
+        else if (_date.day < 10 && _date.month < 10)
+          listData.insert(0,[
+          '${i + 1}',
+          '0${_date.day}/0${_date.month}/${_date.year + 543}',
+          '0',
+          '$lostinDay'
+        ]);
+      saveTotalValue(total_away, total_lost);
+      setValuePreferences(listData[0], i);
+      if(i == days.inDays){ //current
+        awayinDay = 0;
+        lostinDay = 1;
+      }
     }
-    listData.insert(0, prefs.getStringList('listData[$i]'));
-    if(i == days.inDays){ //current
-      awayinDay = int.parse(listData[0][2]);
-      lostinDay = int.parse(listData[0][3]);
+    else{
+      listData.insert(0, prefs.getStringList('listData[$i]'));
+      if(i == days.inDays){ //current
+        awayinDay = int.parse(listData[0][2]);
+        lostinDay = int.parse(listData[0][3]);
+      }
     }
   }
   print(home_lat);
@@ -134,11 +169,11 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         this.lati = location.latitude;
         this.long = location.longitude;
+        if (name == null || listData[0] == null) {
+          getValueForDashboard();
+          print(name);
+        }
       });
-      if (name == null) {
-        getValueForDashboard();
-        print(name);
-      }
       
       print(DateTime.now().toUtc().toString());
       print("Latitude: $lati Longitude: $long");
@@ -193,15 +228,12 @@ class _MyHomePageState extends State<MyHomePage> {
       setValuePreferences(listData[0], listData.length - 1);
       LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
           this.long, this.status, this.distance);
-      print('distance: $distance');
-      print(mockLog.toString());
       database.insert(mockLog);
       database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(
           this.id, location.latitude, location.longitude, this.status);
     });
   }
-
   void getQuery(List<Map<String, dynamic>> res) {
     print('List length: ${res.length}');
     setState(() {
@@ -210,7 +242,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     print(queryResult.length);
     queryResult.asMap().forEach((index, value) {
-      // print(queryResult[index]);
+      print(queryResult[index]);
     });
   }
 
@@ -220,21 +252,16 @@ class _MyHomePageState extends State<MyHomePage> {
     _getCurrentLocation();
     mqttSetup();
     BackgroundLocation.startLocationService();
-    if (name == null) {
-      geofetchTimer = Timer.periodic(Duration(seconds: 15), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(seconds: 5), (Timer t) {
         _getAndPublishLocation();
       });
-    }
-    geofetchTimer = Timer.periodic(Duration(seconds: 15), (Timer t) {
-      _getAndPublishLocation();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            body: name != null
+            body: name != null && listData[0] != []
                 ? dashBoardMain(
                     name: name,
                     surname: surname,
@@ -263,12 +290,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    status = 3;
-    total_lost += 1;
-    lostinDay += 1;
-    saveTotalValue(total_away, total_lost);
-    listData[0][3] = '$lostinDay';
-    setValuePreferences(listData[0], listData.length - 1);
     BackgroundLocation.stopLocationService();
     for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
       subscription.cancel();

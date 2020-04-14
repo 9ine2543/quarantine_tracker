@@ -327,6 +327,11 @@ class _MyHomePageState extends State<MyHomePage> {
     BackgroundLocation.startLocationService();
       geofetchTimer = Timer.periodic(Duration(seconds: 5), (Timer t) {
         _getAndPublishLocation();
+        if(name != null)
+          t.cancel();
+      });
+      geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
+        _getAndPublishLocation();
       });
   }
 

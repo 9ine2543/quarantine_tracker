@@ -7,7 +7,6 @@ Future<bool> checkPreferences() async {
   return prefs.containsKey('name') &&
       prefs.containsKey('surname') &&
       prefs.containsKey('citizenId') &&
-      prefs.containsKey('hospital') &&
       prefs.containsKey('organization') &&
       prefs.containsKey('days') &&
       prefs.containsKey('startDate');

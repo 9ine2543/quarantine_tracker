@@ -19,9 +19,9 @@ bool validatePatientInputs(days, hospital) {
   }
 }
 
-bool validateRelativeInputs(days, patientIDCard, patientName, patientSurname) {
+bool validateRelativeInputs(days, String patientIDCard, patientName, patientSurname) {
   if (days != '' &&
-      patientIDCard != '' &&
+      patientIDCard.length == 13 &&
       patientName != '' &&
       patientSurname != '') {
     return true;

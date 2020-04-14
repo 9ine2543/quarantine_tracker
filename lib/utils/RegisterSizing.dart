@@ -3,7 +3,7 @@ double getRegisterFormSizing(value) {
     case '1':
       return 888;
     case '2':
-      return 1158;
+      return 1160;
     default:
       return 688;
   }

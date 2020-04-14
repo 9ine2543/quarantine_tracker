@@ -18,7 +18,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
   String _value;
   double boxHeight;
   String name, surname, citizenId = '', phoneNumber = '', organization = '', days;
-  String hospital, patientName, patientSurname, patientCitizenId;
+  String hospital, patientName, patientSurname, patientCitizenId = '';
   Position _currentPosition;
   Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   String _title = 'โปรดเลือกที่อยู่อาศัย';

@@ -9,6 +9,10 @@ import 'package:geolocator/geolocator.dart';
 import 'addHomeLocation.dart';
 
 class RegisterQuarantine extends StatefulWidget {
+
+  final VoidCallback onRegistered;
+  RegisterQuarantine({this.onRegistered});
+
   @override
   _RegisterQuarantineState createState() => _RegisterQuarantineState();
 }
@@ -402,7 +406,7 @@ class _RegisterQuarantineState extends State<RegisterQuarantine> {
                               lng: _currentPosition.longitude,
                               home_lat: homelat,
                               home_lng: homelng);
-                          Navigator.pushNamed(context, '/');
+                          widget.onRegistered();
                         },
                         child: Text(
                           'ยืนยัน',

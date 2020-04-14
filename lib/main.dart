@@ -1,13 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:background_location/background_location.dart';
-import 'package:http/http.dart';
-import 'package:quarantine_tracker/model/mqtt.dart';
+import 'package:quarantine_tracker/pages/RegisterQuarantine.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
-import 'package:quarantine_tracker/pages/registerQuarantine.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
 import 'package:quarantine_tracker/model/locationLog.dart';
 import 'package:quarantine_tracker/services/localDatabase.dart';
@@ -130,13 +126,43 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: initScreen,
-        routes: {
-          '/': (context) => MyHomePage(),
-          'register': (context) => RegisterQuarantine()
-        });
+        home: rootPage(),
+    );
   }
 }
+
+class rootPage extends StatefulWidget {
+  @override
+  _rootPageState createState() => _rootPageState();
+}
+
+class _rootPageState extends State<rootPage> {
+
+  void _registered() {
+    setState(() {
+      initScreen = '/';
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    switch (initScreen) {
+      case 'register':
+        return RegisterQuarantine(
+          onRegistered: _registered,
+        );
+      case '/':
+        return MyHomePage();
+      default:
+    }
+  }
+}
+
+
+
+
+
 
 class MyHomePage extends StatefulWidget {
   @override

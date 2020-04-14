@@ -191,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _onCalculate() async {
     distance = await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
-    if(distance <= 15){// normal
+    if(distance <= 30){// normal
       if(isConnected){
         status = 1;
       }

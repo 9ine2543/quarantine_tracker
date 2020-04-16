@@ -4,11 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class dashBoardMain extends StatefulWidget {
   final String name, surname, hospital;
-  final days;
+  final days, log;
   final int total_away, total_lost;
   final List listData;
 
-  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost});
+  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost, this.log});
   @override
   _dashBoardMainState createState() => _dashBoardMainState();
 }
@@ -273,7 +273,8 @@ class _dashBoardMainState extends State<dashBoardMain> {
                     SizedBox(height: 10,),
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: 325,
+                      height: 260,
+                      // color: Colors.red,
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
                         itemCount: widget.listData.length,
@@ -292,6 +293,12 @@ class _dashBoardMainState extends State<dashBoardMain> {
                             )
                           );
                         },
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Text(
+                        widget.log
                       ),
                     )
                   ],

@@ -15,7 +15,7 @@ import 'package:connectivity/connectivity.dart';
 
 var initScreen;
 LocalSQL database = LocalSQL.db;
-String name, surname, hospital, _startDate;
+String name, surname, hospital, _startDate, log = '';
 double home_lat , home_lng;
 int id;
 var days;
@@ -305,6 +305,7 @@ class _MyHomePageState extends State<MyHomePage> {
     queryResult.asMap().forEach((index, value) {
       print(queryResult[index]);
     });
+    log = queryResult[queryResult.length-1].toString();
   }
 
   @override
@@ -330,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if(name != null)
           t.cancel();
       });
-      geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(seconds: 10), (Timer t) {
         _getAndPublishLocation();
       });
   }
@@ -347,7 +348,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     days: days.inDays + 1,
                     listData: listData,
                     total_away: total_away,
-                    total_lost: total_lost)
+                    total_lost: total_lost, 
+                    log: log
+                  )
                 : QuarantineLocation(
                     lat: _currentPosition.latitude,
                     lng: _currentPosition.longitude,
@@ -373,6 +376,7 @@ class _MyHomePageState extends State<MyHomePage> {
       subscription.cancel();
     }
     _connectivitySubscription.cancel();
+    print('disconnect');
     super.dispose();
   }
 }

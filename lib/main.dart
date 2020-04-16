@@ -191,6 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _onCalculate() async {
     distance = await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
+    // distance = await Geolocator().distanceBetween(13.7236552, 100.7243224, lati, long );//13.7227906, 100.7245833
     if(distance <= 30){// normal
       if(isConnected){
         status = 1;
@@ -273,7 +274,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ]);
       }
       _onCalculate();
-      if(status == 2 && inHome == true){
+      if((status == 2 || status == 22) && inHome == true){
         awayinDay += 1;
         total_away += 1;
         inHome = false;
@@ -331,7 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if(name != null)
           t.cancel();
       });
-      geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(minutes: 1), (Timer t) {
         _getAndPublishLocation();
       });
   }

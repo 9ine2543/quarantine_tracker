@@ -17,11 +17,12 @@ var initScreen;
 LocalSQL database = LocalSQL.db;
 String name, surname, hospital, _startDate, log = '';
 double home_lat , home_lng;
-int id;
+int id, count = 0;
 var days;
 int total_away = 0, total_lost = 0, awayinDay = 0, lostinDay = 0;
-bool inHome = false;
+bool inHome = true, isStarted = true;
 List listData = [];
+List<List<String>> areaData = [];
 Position _currentPosition = Position(latitude: 0, longitude: 0);
 
 Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
@@ -103,7 +104,11 @@ Future<void> getValueForDashboard() async {
       }
     }
   }
-  print(home_lat);
+  while(prefs.getStringList('areaData[$count]') != null){
+    areaData.add(prefs.getStringList('areaData[$count]'));
+    count += 1;
+  }
+  // print(prefs.getStringList('areaData[5]'));
 }
 
 Future<void> saveTotalValue(int away, int lost) async {
@@ -115,7 +120,11 @@ Future<void> saveTotalValue(int away, int lost) async {
 Future<void> setValuePreferences(List<String> dataList, int index) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setStringList('listData[$index]', dataList);
-
+}
+Future<void> setAreaPreferences(List<String> dataList, int index) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setStringList('areaData[$index]', dataList);
+  print(prefs.getStringList('areaData[$index]'));
 }
 
 class MyApp extends StatelessWidget {
@@ -179,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List queryResult = [];
   double lati,
       long,
-      distance = 0;
+      distance;
   MQTTClientWrapper mqttClientWrapper;
   Timer geofetchTimer;
   int status = 1; //default
@@ -282,7 +291,15 @@ class _MyHomePageState extends State<MyHomePage> {
       saveTotalValue(total_away, total_lost);
       listData[0][2] = '$awayinDay';
       listData[0][3] = '$lostinDay';
+      print(DateTime.now().toString());
+      if(distance != null){
+        areaData.add(['${count + 1}', listData[0][1], DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}']);
+        print(count);
+        setAreaPreferences(areaData[areaData.length - 1], count);
+        count += 1;
+      }
       setValuePreferences(listData[0], listData.length - 1);
+      print(listData[0][2]);
       if(_connectivity != ConnectivityResult.none && isConnected == false){
         mqttSetup();
         isConnected = true;
@@ -290,6 +307,9 @@ class _MyHomePageState extends State<MyHomePage> {
       LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
           this.long, this.status, this.distance, DateTime.now());
       print(mqttClientWrapper.connectionState);
+
+      isStarted = false;
+      
       database.insert(mockLog);
       database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(
@@ -304,7 +324,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     print(queryResult.length);
     queryResult.asMap().forEach((index, value) {
-      print(queryResult[index]);
+      // print(queryResult[index]);
     });
     log = queryResult[queryResult.length-1].toString();
   }
@@ -327,12 +347,15 @@ class _MyHomePageState extends State<MyHomePage> {
     if(isConnected)
       mqttSetup();
     BackgroundLocation.startLocationService();
-      geofetchTimer = Timer.periodic(Duration(seconds: 5), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+        print('in process');
         _getAndPublishLocation();
-        if(name != null)
+        if(name != null && isStarted == false){
           t.cancel();
+        }
       });
       geofetchTimer = Timer.periodic(Duration(minutes: 1), (Timer t) {
+        print('in process');
         _getAndPublishLocation();
       });
   }
@@ -350,7 +373,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     listData: listData,
                     total_away: total_away,
                     total_lost: total_lost, 
-                    log: log
+                    log: log,
+                    areaData: areaData,
                   )
                 : QuarantineLocation(
                     lat: _currentPosition.latitude,
@@ -364,6 +388,8 @@ class _MyHomePageState extends State<MyHomePage> {
         .then((Position position) {
       setState(() {
         _currentPosition = position;
+        lati = _currentPosition.latitude;
+        long = _currentPosition.longitude;
       });
     }).catchError((e) {
       print(e);

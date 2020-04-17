@@ -354,7 +354,7 @@ class _MyHomePageState extends State<MyHomePage> {
           t.cancel();
         }
       });
-      geofetchTimer = Timer.periodic(Duration(minutes: 1), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
         print('in process');
         _getAndPublishLocation();
       });

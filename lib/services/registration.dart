@@ -72,4 +72,5 @@ Future<void> saveToSharedPreferences(
   prefs.setDouble('homeLong', home_lng);
   prefs.setInt('totalAway', 0);
   prefs.setInt('totalLost', 0);
+  prefs.setBool('inHome', true);
 }

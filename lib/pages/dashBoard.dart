@@ -4,8 +4,9 @@ class dashBoardMain extends StatefulWidget {
   final days, log;
   final int total_away, total_lost;
   final List listData, areaData;
+  final lat, lng;
 
-  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost, this.log, this.areaData});
+  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost, this.log, this.areaData, this.lat, this.lng});
   @override
   _dashBoardMainState createState() => _dashBoardMainState();
 }
@@ -126,7 +127,7 @@ class _dashBoardMainState extends State<dashBoardMain> {
                 ),
                 child: RawMaterialButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData,)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData,lat: widget.lat, lng: widget.lng)));
                   },
                   child: Stack(
                     children: <Widget>[
@@ -320,7 +321,8 @@ class _dashBoardMainState extends State<dashBoardMain> {
 class outOfAreaMain extends StatefulWidget {
   final String name, surname;
   final List areaData;
-  outOfAreaMain({this.name, this.surname, this.areaData});
+  final lat, lng;
+  outOfAreaMain({this.name, this.surname, this.areaData, this.lat, this.lng});
   @override
   _outOfAreaMainState createState() => _outOfAreaMainState();
 }

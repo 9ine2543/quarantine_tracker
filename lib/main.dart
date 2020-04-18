@@ -20,7 +20,7 @@ double home_lat , home_lng;
 int id, count = 0;
 var days;
 int total_away = 0, total_lost = 0, awayinDay = 0, lostinDay = 0;
-bool inHome = true, isStarted = true;
+bool inHome, isStarted = true;
 List listData = [];
 List<List<String>> areaData = [];
 Position _currentPosition = Position(latitude: 0, longitude: 0);
@@ -49,6 +49,7 @@ Future<void> getValueForDashboard() async {
   total_away = prefs.getInt('totalAway');
   total_lost = prefs.getInt('totalLost');
   id = prefs.getInt('id');
+  inHome = prefs.getBool('inHome');
   days = DateTime.now().difference(DateTime.parse(_startDate));
   List<String> start_date = [_startDate.substring(0,4), _startDate.substring(5,7), _startDate.substring(8,10)];
   print(start_date);
@@ -120,6 +121,10 @@ Future<void> saveTotalValue(int away, int lost) async {
 Future<void> setValuePreferences(List<String> dataList, int index) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setStringList('listData[$index]', dataList);
+}
+Future<void> setInHome(bool value) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool('inHome', value);
 }
 Future<void> setAreaPreferences(List<String> dataList, int index) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -309,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print(mqttClientWrapper.connectionState);
 
       isStarted = false;
-      
+      setInHome(inHome);
       database.insert(mockLog);
       database.logs().then((logs) => getQuery(logs));
       mqttClientWrapper.publishLocation(

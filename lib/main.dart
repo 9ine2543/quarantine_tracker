@@ -201,6 +201,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _onCalculate(double home_lat, double home_lng, double lat, double lng) async {
     distance = await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
+    
+    // distance = await Geolocator().distanceBetween(13.7992131, 100.5486174, 13.7918731, 100.5499642);
     print('aaaaaaaaaaaa');//13.7227906, 100.7245833
     print(distance);
   }
@@ -208,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _getAndPublishLocation() {
     BackgroundLocation().getCurrentLocation().then((location) {
       setState(() {
+        isStarted = false;
         this.lati = location.latitude;
         this.long = location.longitude;
         if (name == null || listData[0] == null) {
@@ -294,7 +297,6 @@ class _MyHomePageState extends State<MyHomePage> {
         LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
             this.long, this.status, this.distance, DateTime.now());
         print(mqttClientWrapper.connectionState);
-        isStarted = false;
         setInHome(inHome);
         database.insert(mockLog);
         database.logs().then((logs) => getQuery(logs));
@@ -318,6 +320,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mqttSetup();
           isConnected = true;
       }
+      
     });
   }
   void getQuery(List<Map<String, dynamic>> res) {
@@ -351,9 +354,12 @@ class _MyHomePageState extends State<MyHomePage> {
     if(isConnected)
       mqttSetup();
     BackgroundLocation.startLocationService();
-      geofetchTimer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(seconds: 3), (Timer t) {
         print('in process');
         _getAndPublishLocation();
+        isStarted = false;
+        print(name != null);
+        print(isStarted == false);
         if(name != null && isStarted == false){
           t.cancel();
         }

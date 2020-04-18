@@ -4,8 +4,9 @@ class dashBoardMain extends StatefulWidget {
   final days, log;
   final int total_away, total_lost;
   final List listData, areaData;
+  final homelat, homelng;
 
-  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost, this.log, this.areaData});
+  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost, this.log, this.areaData, this.homelat, this.homelng});
   @override
   _dashBoardMainState createState() => _dashBoardMainState();
 }
@@ -126,7 +127,7 @@ class _dashBoardMainState extends State<dashBoardMain> {
                 ),
                 child: RawMaterialButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData, hlat: widget.homelat, hlng: widget.homelng,)));
                   },
                   child: Stack(
                     children: <Widget>[
@@ -320,7 +321,8 @@ class _dashBoardMainState extends State<dashBoardMain> {
 class outOfAreaMain extends StatefulWidget {
   final String name, surname;
   final List areaData;
-  outOfAreaMain({this.name, this.surname, this.areaData});
+  final hlat, hlng;
+  outOfAreaMain({this.name, this.surname, this.areaData, this.hlat, this.hlng});
   @override
   _outOfAreaMainState createState() => _outOfAreaMainState();
 }
@@ -394,6 +396,19 @@ class _outOfAreaMainState extends State<outOfAreaMain> {
                   elevation: 0,
                   fillColor: Colors.white,
                 )
+              )
+            ),
+            Align(
+              alignment: Alignment(0,-0.61),
+              child: Container(
+                child: Text(
+                  '${widget.hlat}, ${widget.hlng}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300 
+                  ),
+                ),
               )
             ),
             Align(
@@ -487,7 +502,7 @@ class _outOfAreaMainState extends State<outOfAreaMain> {
                                 // Align(alignment: Alignment(0,0),child: Text(widget.areaData[index][2],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
                                 // Align(alignment: Alignment(0.43,0),child: Text(widget.areaData[index][3],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
                                 // Align(alignment: Alignment(0.87,0),child: Text(widget.areaData[index][4],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B))))
-                                Align(alignment: Alignment(-0.85,0), child: Text(widget.areaData[index][5],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
+                                Align(alignment: Alignment(-0.85,0), child: Text(widget.areaData[index][5],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),
                                 Align(alignment: Alignment(-0.65,0), child: Text(widget.areaData[index][0],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),
                                 Align(alignment: Alignment(-0.05,0),child: Text(widget.areaData[index][1],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),
                                 Align(alignment: Alignment(0.4,0),child: Text(widget.areaData[index][2],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),

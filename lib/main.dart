@@ -360,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
           t.cancel();
         }
       });
-      geofetchTimer = Timer.periodic(Duration(seconds: 5), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
         print('in process');
         _getAndPublishLocation();
       });
@@ -381,6 +381,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     total_lost: total_lost, 
                     log: log,
                     areaData: areaData,
+                    homelat: home_lat,
+                    homelng: home_lng,
                   )
                 : QuarantineLocation(
                     lat: _currentPosition.latitude,

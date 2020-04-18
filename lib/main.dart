@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:background_location/background_location.dart';
+import 'package:quarantine_tracker/model/mqtt.dart';
 import 'package:quarantine_tracker/pages/RegisterQuarantine.dart';
 import 'package:quarantine_tracker/services/mqttClientWrapper.dart';
 import 'package:quarantine_tracker/pages/quarantineLocation.dart';
@@ -173,11 +174,6 @@ class _rootPageState extends State<rootPage> {
   }
 }
 
-
-
-
-
-
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -187,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isConnected = true;
   ConnectivityResult _connectivity ;
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
-
+  bool canCal = false;
   List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
   List queryResult = [];
@@ -203,23 +199,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
-  Future<void> _onCalculate() async {
+  Future<void> _onCalculate(double home_lat, double home_lng, double lat, double lng) async {
     distance = await Geolocator().distanceBetween(home_lat, home_lng, lati, long);
-    // distance = await Geolocator().distanceBetween(13.7236552, 100.7243224, lati, long );//13.7227906, 100.7245833
-    if(distance <= 30){// normal
-      if(isConnected){
-        status = 1;
-      }
-      else
-        status = 11;
-      inHome = true;
-    }
-    else //away
-      if(isConnected){
-        status = 2;
-      }
-      else
-        status = 22;
+    print('aaaaaaaaaaaa');//13.7227906, 100.7245833
+    print(distance);
   }
 
   void _getAndPublishLocation() {
@@ -229,12 +212,99 @@ class _MyHomePageState extends State<MyHomePage> {
         this.long = location.longitude;
         if (name == null || listData[0] == null) {
           getValueForDashboard();
-          print(name);
+        }
+        print("Latitude: $lati Longitude: $long");
+        print('bbbbbbbbbbbbbb');
+        if(home_lat != null && home_lng != null && lati != null && long != null)
+        _onCalculate(home_lat, home_lng, this.lati, this.long);
+      });
+      Future.delayed(new Duration(milliseconds: 500), ()
+      {
+        if(distance <= 30){// normal
+          if(isConnected){
+            status = 1;
+          }
+          else
+            status = 11;
+          inHome = true;
+        }
+        else //away
+          if(isConnected){
+            status = 2;
+          }
+          else
+            status = 22;
+        
+        days = DateTime.now().difference(DateTime.parse(_startDate));
+        if (days.inDays == listData.length) {
+          awayinDay = 0;
+          lostinDay = 0;
+          setValuePreferences([
+            '${days.inDays + 1}',
+            '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
+            '$awayinDay',
+            '$lostinDay'
+          ], listData.length);
+          if (DateTime.now().day > 9 && DateTime.now().month > 9)
+            listData.insert(0, [
+              '${days.inDays + 1}',
+              '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
+              '$awayinDay',
+              '$lostinDay'
+            ]);
+          else if (DateTime.now().day > 9 && DateTime.now().month < 10)
+            listData.insert(0, [
+              '${days.inDays + 1}',
+              '${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
+              '$awayinDay',
+              '$lostinDay'
+            ]);
+          else if (DateTime.now().day < 10 && DateTime.now().month > 9)
+            listData.insert(0, [
+              '${days.inDays + 1}',
+              '0${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
+              '$awayinDay',
+              '$lostinDay'
+            ]);
+          else if (DateTime.now().day < 10 && DateTime.now().month < 10)
+            listData.insert(0, [
+              '${days.inDays + 1}',
+              '0${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
+              '$awayinDay',
+              '$lostinDay'
+            ]);
+        }
+        
+        if((status == 2 || status == 22) && inHome == true){
+          awayinDay += 1;
+          total_away += 1;
+          inHome = false;
+        }
+        saveTotalValue(total_away, total_lost);
+        listData[0][2] = '$awayinDay';
+        listData[0][3] = '$lostinDay';
+        if(distance != null){
+          // areaData.add(['${count + 1}', listData[0][1], DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}']);
+          areaData.add(['$lati', '$long', DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}', '${count + 1}']);
+          setAreaPreferences(areaData[areaData.length - 1], count);
+          count += 1;
+        }
+        setValuePreferences(listData[0], listData.length - 1);
+        
+        LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
+            this.long, this.status, this.distance, DateTime.now());
+        print(mqttClientWrapper.connectionState);
+        isStarted = false;
+        setInHome(inHome);
+        database.insert(mockLog);
+        database.logs().then((logs) => getQuery(logs));
+        if(isConnected){
+          mqttClientWrapper.publishLocation(
+              id, location.latitude, location.longitude, this.status);
         }
       });
-      
+        
       _connectivitySubscription == Connectivity().onConnectivityChanged.listen((ConnectivityResult result){
-        print(result);
         _connectivity = result;
         if(result == ConnectivityResult.none){ //ปิดเน็ต
           if(isConnected){
@@ -244,82 +314,10 @@ class _MyHomePageState extends State<MyHomePage> {
           isConnected = false;
         }
       });
-
-      print(DateTime.now().toUtc().toString());
-      print("Latitude: $lati Longitude: $long");
-      days = DateTime.now().difference(DateTime.parse(_startDate));
-      print(days);
-      if (days.inDays == listData.length) {
-        awayinDay = 0;
-        lostinDay = 0;
-        setValuePreferences([
-          '${days.inDays + 1}',
-          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
-          '$awayinDay',
-          '$lostinDay'
-        ], listData.length);
-        if (DateTime.now().day > 9 && DateTime.now().month > 9)
-          listData.insert(0, [
-            '${days.inDays + 1}',
-            '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
-            '$awayinDay',
-            '$lostinDay'
-          ]);
-        else if (DateTime.now().day > 9 && DateTime.now().month < 10)
-          listData.insert(0, [
-            '${days.inDays + 1}',
-            '${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
-            '$awayinDay',
-            '$lostinDay'
-          ]);
-        else if (DateTime.now().day < 10 && DateTime.now().month > 9)
-          listData.insert(0, [
-            '${days.inDays + 1}',
-            '0${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year + 543}',
-            '$awayinDay',
-            '$lostinDay'
-          ]);
-        else if (DateTime.now().day < 10 && DateTime.now().month < 10)
-          listData.insert(0, [
-            '${days.inDays + 1}',
-            '0${DateTime.now().day}/0${DateTime.now().month}/${DateTime.now().year + 543}',
-            '$awayinDay',
-            '$lostinDay'
-          ]);
+      if((_connectivity != ConnectivityResult.none && isConnected == false) || (_connectivity != ConnectivityResult.none && mqttClientWrapper.connectionState == MqttCurrentConnectionState.DISCONNECTED)){
+          mqttSetup();
+          isConnected = true;
       }
-      _onCalculate();
-      if((status == 2 || status == 22) && inHome == true){
-        awayinDay += 1;
-        total_away += 1;
-        inHome = false;
-      }
-      saveTotalValue(total_away, total_lost);
-      listData[0][2] = '$awayinDay';
-      listData[0][3] = '$lostinDay';
-      print(DateTime.now().toString());
-      if(distance != null){
-        // areaData.add(['${count + 1}', listData[0][1], DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}']);
-        areaData.add(['$lati', '$long', DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}', '${count + 1}']);
-        print(count);
-        setAreaPreferences(areaData[areaData.length - 1], count);
-        count += 1;
-      }
-      setValuePreferences(listData[0], listData.length - 1);
-      print(listData[0][2]);
-      if(_connectivity != ConnectivityResult.none && isConnected == false){
-        mqttSetup();
-        isConnected = true;
-      }
-      LocationLog mockLog = LocationLog(Random().nextInt(1000000), this.lati,
-          this.long, this.status, this.distance, DateTime.now());
-      print(mqttClientWrapper.connectionState);
-
-      isStarted = false;
-      setInHome(inHome);
-      database.insert(mockLog);
-      database.logs().then((logs) => getQuery(logs));
-      mqttClientWrapper.publishLocation(
-          id, location.latitude, location.longitude, this.status);
     });
   }
   void getQuery(List<Map<String, dynamic>> res) {
@@ -328,7 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
       queryResult.clear();
       queryResult.addAll(res);
     });
-    print(queryResult.length);
+    // print(queryResult.length);
     queryResult.asMap().forEach((index, value) {
       // print(queryResult[index]);
     });
@@ -361,7 +359,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       });
       geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
-        print('in process');
+        print('2');
         _getAndPublishLocation();
       });
   }

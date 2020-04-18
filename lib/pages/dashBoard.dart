@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 class dashBoardMain extends StatefulWidget {
   final String name, surname, hospital;
@@ -127,7 +129,7 @@ class _dashBoardMainState extends State<dashBoardMain> {
                 ),
                 child: RawMaterialButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData, hlat: widget.homelat, hlng: widget.homelng,)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData, hlat: widget.homelat, hlng: widget.homelng, counter: widget.total_away,)));
                   },
                   child: Stack(
                     children: <Widget>[
@@ -322,7 +324,8 @@ class outOfAreaMain extends StatefulWidget {
   final String name, surname;
   final List areaData;
   final hlat, hlng;
-  outOfAreaMain({this.name, this.surname, this.areaData, this.hlat, this.hlng});
+  final counter;
+  outOfAreaMain({this.name, this.surname, this.areaData, this.hlat, this.hlng, this.counter});
   @override
   _outOfAreaMainState createState() => _outOfAreaMainState();
 }
@@ -448,7 +451,7 @@ class _outOfAreaMainState extends State<outOfAreaMain> {
                       alignment: Alignment(0,1.4),
                       child: Text(
                         // '${widget.total_away}',
-                        '0',
+                        '${widget.counter}',
                         style: TextStyle(
                           color: Color(0xFF5B5B5B),
                           fontFamily: 'Prompt',

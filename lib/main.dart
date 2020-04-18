@@ -298,7 +298,8 @@ class _MyHomePageState extends State<MyHomePage> {
       listData[0][3] = '$lostinDay';
       print(DateTime.now().toString());
       if(distance != null){
-        areaData.add(['${count + 1}', listData[0][1], DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}']);
+        // areaData.add(['${count + 1}', listData[0][1], DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}']);
+        areaData.add(['$lati', '$long', DateTime.now().toString().substring(11,16), '$status', '${distance.toInt()}', '${count + 1}']);
         print(count);
         setAreaPreferences(areaData[areaData.length - 1], count);
         count += 1;
@@ -359,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
           t.cancel();
         }
       });
-      geofetchTimer = Timer.periodic(Duration(minutes: 15), (Timer t) {
+      geofetchTimer = Timer.periodic(Duration(seconds: 5), (Timer t) {
         print('in process');
         _getAndPublishLocation();
       });

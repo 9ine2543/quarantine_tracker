@@ -4,9 +4,8 @@ class dashBoardMain extends StatefulWidget {
   final days, log;
   final int total_away, total_lost;
   final List listData, areaData;
-  final lat, lng;
 
-  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost, this.log, this.areaData, this.lat, this.lng});
+  dashBoardMain({this.name, this.surname, this.hospital, this.days, this.listData, this.total_away, this.total_lost, this.log, this.areaData});
   @override
   _dashBoardMainState createState() => _dashBoardMainState();
 }
@@ -127,7 +126,7 @@ class _dashBoardMainState extends State<dashBoardMain> {
                 ),
                 child: RawMaterialButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData,lat: widget.lat, lng: widget.lng)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => outOfAreaMain(name: widget.name,surname: widget.surname,areaData: widget.areaData)));
                   },
                   child: Stack(
                     children: <Widget>[
@@ -321,8 +320,7 @@ class _dashBoardMainState extends State<dashBoardMain> {
 class outOfAreaMain extends StatefulWidget {
   final String name, surname;
   final List areaData;
-  final lat, lng;
-  outOfAreaMain({this.name, this.surname, this.areaData, this.lat, this.lng});
+  outOfAreaMain({this.name, this.surname, this.areaData});
   @override
   _outOfAreaMainState createState() => _outOfAreaMainState();
 }
@@ -484,11 +482,17 @@ class _outOfAreaMainState extends State<outOfAreaMain> {
                             padding: EdgeInsets.only(bottom: 10),
                             child: Stack(
                               children: <Widget>[
-                                Align(alignment: Alignment(-0.85,0), child: Text(widget.areaData[index][0],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
-                                Align(alignment: Alignment(-0.58,0),child: Text(widget.areaData[index][1],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
-                                Align(alignment: Alignment(0,0),child: Text(widget.areaData[index][2],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
-                                Align(alignment: Alignment(0.43,0),child: Text(widget.areaData[index][3],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
-                                Align(alignment: Alignment(0.87,0),child: Text(widget.areaData[index][4],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B))))
+                                // Align(alignment: Alignment(-0.85,0), child: Text(widget.areaData[index][0],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
+                                // Align(alignment: Alignment(-0.58,0),child: Text(widget.areaData[index][1],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
+                                // Align(alignment: Alignment(0,0),child: Text(widget.areaData[index][2],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
+                                // Align(alignment: Alignment(0.43,0),child: Text(widget.areaData[index][3],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
+                                // Align(alignment: Alignment(0.87,0),child: Text(widget.areaData[index][4],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B))))
+                                Align(alignment: Alignment(-0.85,0), child: Text(widget.areaData[index][5],style: TextStyle(fontSize: 16,color: Color(0xFF5B5B5B)))),
+                                Align(alignment: Alignment(-0.65,0), child: Text(widget.areaData[index][0],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),
+                                Align(alignment: Alignment(-0.05,0),child: Text(widget.areaData[index][1],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),
+                                Align(alignment: Alignment(0.4,0),child: Text(widget.areaData[index][2],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),
+                                Align(alignment: Alignment(0.58,0),child: Text(widget.areaData[index][3],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B)))),
+                                Align(alignment: Alignment(0.87,0),child: Text(widget.areaData[index][4],style: TextStyle(fontSize: 12,color: Color(0xFF5B5B5B))))
                               ],
                             )
                           );
